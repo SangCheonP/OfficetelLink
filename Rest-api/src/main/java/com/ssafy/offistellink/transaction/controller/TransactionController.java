@@ -23,7 +23,7 @@ public class TransactionController {
 
     @GetMapping("")
     public String getAllTransactions(Model model) {
-        List<TransactionDto> transactions = transactionService.selectAll();
+        List<TransactionDto> transactions = transactionService.getAllTransactions();
         model.addAttribute("transactions", transactions);
         return "transactionList"; // 트랜잭션 목록을 보여줄 뷰의 이름
     }

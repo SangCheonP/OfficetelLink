@@ -14,7 +14,7 @@ public class TransactionServiceImpl implements TransactionService{
     private TransactionMapper transactionMapper;
 
     @Override
-    public List<TransactionDto> selectAll() {
+    public List<TransactionDto> getAllTransactions() {
         return transactionMapper.selectAll();
     }
 }
