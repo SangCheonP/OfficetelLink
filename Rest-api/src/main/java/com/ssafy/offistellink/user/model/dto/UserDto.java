@@ -1,4 +1,4 @@
-package com.ssafy.offistellink.model.dto;
+package com.ssafy.offistellink.user.model.dto;
 
 import lombok.Data;
 

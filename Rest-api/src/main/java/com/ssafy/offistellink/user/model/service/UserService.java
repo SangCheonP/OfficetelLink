@@ -1,6 +1,6 @@
-package com.ssafy.offistellink.model.service;
+package com.ssafy.offistellink.user.model.service;
 
-import com.ssafy.offistellink.model.dto.UserDto;
+import com.ssafy.offistellink.user.model.dto.UserDto;
 
 import java.sql.SQLException;
 import java.util.List;

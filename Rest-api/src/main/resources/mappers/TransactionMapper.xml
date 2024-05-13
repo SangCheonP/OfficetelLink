@@ -1,8 +1,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ssafy.offistellink.model.transaction.mapper.TransactionMapper">
+<mapper namespace="com.ssafy.offistellink.transaction.model.mapper.TransactionMapper">
 
-    <select id="selectAll" resultType="com.ssafy.offistellink.model.transaction.dto.TransactionDto">
+    <select id="selectAll" resultType="com.ssafy.offistellink.transaction.model.dto.TransactionDto">
         SELECT * FROM transactions
     </select>
 

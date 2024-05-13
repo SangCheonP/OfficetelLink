@@ -1,4 +1,4 @@
-package com.ssafy.offistellink.model.transaction.dto;
+package com.ssafy.offistellink.transaction.model.dto;
 
 import lombok.Getter;
 import lombok.Setter;

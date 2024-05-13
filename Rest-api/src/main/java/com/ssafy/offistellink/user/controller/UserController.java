@@ -1,7 +1,7 @@
-package com.ssafy.offistellink.controller;
+package com.ssafy.offistellink.user.controller;
 
-import com.ssafy.offistellink.model.dto.UserDto;
-import com.ssafy.offistellink.model.service.UserService;
+import com.ssafy.offistellink.user.model.dto.UserDto;
+import com.ssafy.offistellink.user.model.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

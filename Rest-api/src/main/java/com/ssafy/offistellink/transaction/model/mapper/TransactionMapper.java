@@ -1,6 +1,6 @@
-package com.ssafy.offistellink.model.transaction.mapper;
+package com.ssafy.offistellink.transaction.model.mapper;
 
-import com.ssafy.offistellink.model.transaction.dto.TransactionDto;
+import com.ssafy.offistellink.transaction.model.dto.TransactionDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

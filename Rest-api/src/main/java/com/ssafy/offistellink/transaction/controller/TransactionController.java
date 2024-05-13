@@ -1,7 +1,7 @@
-package com.ssafy.offistellink.controller.transaction;
+package com.ssafy.offistellink.transaction.controller;
 
-import com.ssafy.offistellink.model.transaction.dto.TransactionDto;
-import com.ssafy.offistellink.model.transaction.service.TransactionService;
+import com.ssafy.offistellink.transaction.model.dto.TransactionDto;
+import com.ssafy.offistellink.transaction.model.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

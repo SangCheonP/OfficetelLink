@@ -1,7 +1,7 @@
-package com.ssafy.offistellink.model.service;
+package com.ssafy.offistellink.user.model.service;
 
-import com.ssafy.offistellink.model.dto.UserDto;
-import com.ssafy.offistellink.model.mapper.UserMapper;
+import com.ssafy.offistellink.user.model.dto.UserDto;
+import com.ssafy.offistellink.user.model.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
