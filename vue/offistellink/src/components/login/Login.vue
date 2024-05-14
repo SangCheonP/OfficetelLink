@@ -1,72 +1,3 @@
-<template>
-  <div class="limiter">
-    <div class="container-login100">
-      <div class="wrap-login100 row">
-        <div class="login100-pic js-tilt d-none d-lg-block col-lg-6" data-tilt>
-          <img src="@/assets/images/login-page-img.png" alt="IMG" />
-        </div>
-
-        <form
-          class="login100-form validate-form col-12 col-lg-6 d-flex flex-column align-items-center justify-content-center"
-          @submit.prevent="handleSubmit"
-        >
-          <span class="login100-form-title"> 로그인 하기 </span>
-
-          <div
-            class="wrap-input100 validate-input"
-            data-validate="Valid email is required: ex@abc.xyz"
-          >
-            <input
-              class="input100"
-              type="text"
-              name="email"
-              placeholder="Email"
-              v-model="email"
-            />
-            <span class="focus-input100"></span>
-            <span class="symbol-input100">
-              <i class="fa fa-envelope" aria-hidden="true"></i>
-            </span>
-          </div>
-
-          <div
-            class="wrap-input100 validate-input"
-            data-validate="Password is required"
-          >
-            <input
-              class="input100"
-              type="password"
-              name="pass"
-              placeholder="Password"
-              v-model="password"
-            />
-            <span class="focus-input100"></span>
-            <span class="symbol-input100">
-              <i class="fa fa-lock" aria-hidden="true"></i>
-            </span>
-          </div>
-
-          <div class="container-login100-form-btn">
-            <button class="login100-form-btn">Login</button>
-          </div>
-
-          <div class="text-center p-t-12">
-            <span class="txt1"> Forgot </span>
-            <a class="txt2" href="#"> Username / Password? </a>
-          </div>
-
-          <div class="text-center p-t-136">
-            <a class="txt2" href="/register">
-              Create your Account
-              <i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
-            </a>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
@@ -87,10 +18,85 @@ const handleSubmit = () => {
 };
 </script>
 
+<template>
+  <div>
+    <div class="limiter">
+      <main class="container-login100">
+        <section class="wrap-login100 row">
+          <div
+            class="login100-pic js-tilt d-none d-lg-block col-lg-6"
+            data-tilt
+          >
+            <img src="@/assets/images/login-page-img.png" alt="IMG" />
+          </div>
+
+          <form
+            class="login100-form validate-form col-12 col-lg-6 d-flex flex-column align-items-center justify-content-center"
+            @submit.prevent="handleSubmit"
+          >
+            <h1 class="login100-form-title">로그인</h1>
+
+            <div
+              class="wrap-input100 validate-input"
+              data-validate="Valid email is required: ex@abc.xyz"
+            >
+              <input
+                class="input100"
+                type="text"
+                name="email"
+                placeholder="이메일"
+                v-model="email"
+              />
+              <span class="focus-input100"></span>
+              <span class="symbol-input100">
+                <i class="fa fa-envelope" aria-hidden="true"></i>
+              </span>
+            </div>
+
+            <div
+              class="wrap-input100 validate-input"
+              data-validate="Password is required"
+            >
+              <input
+                class="input100"
+                type="password"
+                name="pass"
+                placeholder="비밀번호"
+                v-model="password"
+              />
+              <span class="focus-input100"></span>
+              <span class="symbol-input100">
+                <i class="fa fa-lock" aria-hidden="true"></i>
+              </span>
+            </div>
+
+            <div class="container-login100-form-btn">
+              <button class="login100-form-btn">로그인</button>
+            </div>
+
+            <div class="text-center p-t-12">
+              <router-link class="txt2" href="#">
+                이메일 / 비밀번호 찾기
+              </router-link>
+            </div>
+
+            <div class="text-center p-t-36">
+              <router-link class="txt2" :to="{ name: 'Register' }">
+                계정 생성하기
+                <i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
+              </router-link>
+            </div>
+          </form>
+        </section>
+      </main>
+    </div>
+  </div>
+</template>
+
 <style scoped>
-@import url('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
-@import url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css');
-@import url('https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css');
+@import url("https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css");
+@import url("https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css");
 
 .limiter {
   width: 100%;
@@ -143,25 +149,25 @@ const handleSubmit = () => {
 }
 
 .login100-form-title {
-  font-family: Poppins-Medium;
-  font-size: 30px;
+  font-family: "Poppins", sans-serif;
+  font-size: 45px;
   color: #333333;
   line-height: 1.2;
   text-align: center;
   width: 100%;
   display: block;
-  padding-bottom: 54px;
+  padding-bottom: 45px;
 }
 
 .wrap-input100 {
   position: relative;
   width: 100%;
   z-index: 1;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 .input100 {
-  font-family: Poppins-Medium;
+  font-family: "Poppins", sans-serif;
   font-size: 15px;
   color: #666666;
   line-height: 1.5;
@@ -171,6 +177,7 @@ const handleSubmit = () => {
   height: 50px;
   border-radius: 25px;
   padding: 0 30px 0 68px;
+  border: none;
 }
 
 .focus-input100 {
@@ -227,7 +234,7 @@ const handleSubmit = () => {
 }
 
 .login100-form-btn {
-  font-family: Montserrat-Bold;
+  font-family: "Montserrat", sans-serif;
   font-size: 18px;
   line-height: 1.5;
   color: #fff;
@@ -248,6 +255,7 @@ const handleSubmit = () => {
   -o-transition: all 0.4s;
   -moz-transition: all 0.4s;
   transition: all 0.4s;
+  border: none;
 }
 
 .login100-form-btn:hover {
@@ -262,20 +270,20 @@ const handleSubmit = () => {
   padding-top: 12px;
 }
 
-.p-t-136 {
-  padding-top: 136px;
+.p-t-36 {
+  padding-top: 36px;
 }
 
 .txt1 {
-  font-family: Poppins-Regular;
+  font-family: "Poppins", sans-serif;
   font-size: 18px;
   color: #666666;
   line-height: 1.5;
 }
 
 .txt2 {
-  font-family: Poppins-Regular;
-  font-size: 15px;
+  font-family: "Poppins", sans-serif;
+  font-size: 18px;
   color: #57b846;
   line-height: 1.5;
 }
@@ -288,7 +296,6 @@ const handleSubmit = () => {
   margin-left: 5px;
 }
 
-/* Other required CSS */
 @keyframes anim-shadow {
   to {
     box-shadow: 0px 0px 70px 25px;

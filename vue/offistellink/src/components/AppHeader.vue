@@ -3,16 +3,20 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 
-
 // 로그인 함수
 const navigateToLogin = () => {
-  router.push('/login');
+  router.push("/login");
 };
 </script>
 
 <template>
   <div>
     <!-- ======= Header/Navbar ======= -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Montserrat:wght@700&display=swap"
+      rel="stylesheet"
+    />
+
     <nav class="navbar navbar-default navbar-trans navbar-expand-lg fixed-top">
       <div class="container">
         <button
@@ -28,44 +32,79 @@ const navigateToLogin = () => {
           <span></span>
           <span></span>
         </button>
-        <a class="navbar-brand text-brand" href="/">OfficetelLink</a>
+        <router-link class="navbar-brand text-brand" :to="{ name: 'Home' }"
+          >OfficetelLink</router-link
+        >
 
-        <div class="navbar-collapse collapse justify-content-center" id="navbarDefault">
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <router-link class="nav-link" to="/" exact-active-class="active">Home</router-link>
-      </li>
-      <li class="nav-item">
-        <router-link class="nav-link" to="/about" exact-active-class="active">About</router-link>
-      </li>
-      <li class="nav-item">
-        <router-link class="nav-link" to="/property" exact-active-class="active">Property</router-link>
-      </li>
-      <li class="nav-item">
-        <router-link class="nav-link" to="/blog" exact-active-class="active">Blog</router-link>
-      </li>
-      <li class="nav-item dropdown">
-        <a
-          class="nav-link dropdown-toggle"
-          href="#"
-          id="navbarDropdown"
-          role="button"
-          data-bs-toggle="dropdown"
-          aria-haspopup="true"
-          aria-expanded="false"
-        >Pages</a>
-        <div class="dropdown-menu">
-          <router-link class="dropdown-item" to="/property-single">Property Single</router-link>
-          <router-link class="dropdown-item" to="/blog-single">Blog Single</router-link>
-          <router-link class="dropdown-item" to="/agents-grid">Agents Grid</router-link>
-          <router-link class="dropdown-item" to="/agent-single">Agent Single</router-link>
+        <div
+          class="navbar-collapse collapse justify-content-center"
+          id="navbarDefault"
+        >
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <router-link
+                class="nav-link"
+                :to="{ name: 'Home' }"
+                exact-active-class="active"
+                >Home</router-link
+              >
+            </li>
+            <li class="nav-item">
+              <router-link
+                class="nav-link"
+                to="/about"
+                exact-active-class="active"
+                >About</router-link
+              >
+            </li>
+            <li class="nav-item">
+              <router-link
+                class="nav-link"
+                to="/property"
+                exact-active-class="active"
+                >Property</router-link
+              >
+            </li>
+            <li class="nav-item">
+              <router-link
+                class="nav-link"
+                to="/blog"
+                exact-active-class="active"
+                >Blog</router-link
+              >
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                >Pages</a
+              >
+              <div class="dropdown-menu">
+                <router-link class="dropdown-item" to="/property-single"
+                  >Property Single</router-link
+                >
+                <router-link class="dropdown-item" to="/blog-single"
+                  >Blog Single</router-link
+                >
+                <router-link class="dropdown-item" to="/agents-grid"
+                  >Agents Grid</router-link
+                >
+                <router-link class="dropdown-item" to="/agent-single"
+                  >Agent Single</router-link
+                >
+              </div>
+            </li>
+          </ul>
         </div>
-      </li>
-    </ul>
-  </div>
 
         <button
           class="image-button btn-b-n navbar-toggle-box navbar-toggle-box-collapse"
+          type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarTogglerDemo01"
           @click="navigateToLogin"
@@ -87,12 +126,14 @@ const navigateToLogin = () => {
 .nav-link.active {
   color: #ff5733; /* 원하는 색상으로 변경 */
   font-weight: bold;
+  font-family: "Poppins", sans-serif; /* 폰트 적용 */
 }
 
 a {
   color: #000000;
   text-decoration: none;
   transition: all 0.5s ease;
+  font-family: "Poppins", sans-serif; /* 폰트 적용 */
 }
 
 a:hover {
@@ -171,6 +212,7 @@ a:hover {
   position: relative;
   padding-left: 0;
   padding-right: 0;
+  font-family: "Poppins", sans-serif; /* 폰트 적용 */
 }
 
 .navbar-default.navbar-trans .nav-link:before,
@@ -352,5 +394,10 @@ a:hover {
   top: 10px;
   transform: rotate(-135deg);
   opacity: 0.9;
+}
+
+/* 추가된 부분: OfficetelLink 폰트 크기 조정 */
+.navbar-brand {
+  font-size: 2rem; /* 원하는 폰트 크기로 조정 */
 }
 </style>
