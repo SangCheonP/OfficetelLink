@@ -15,11 +15,14 @@ public class TransactionDto {
     private int deal;
     private int floor;
     private String roadName;
+    private double latitude;
+    private double longitude;
 
     public TransactionDto() {
     }
 
-    public TransactionDto(int id, String sigungu, String bungi, String dangiName, double area, String contractDate, int deal, int floor, String roadName) {
+    public TransactionDto(int id, String sigungu, String bungi, String dangiName, double area, String contractDate, int deal, int floor, String roadName, double latitude, double longitude) {
+
         this.id = id;
         this.sigungu = sigungu;
         this.bungi = bungi;
@@ -29,6 +32,8 @@ public class TransactionDto {
         this.deal = deal;
         this.floor = floor;
         this.roadName = roadName;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     @Override
@@ -43,6 +48,8 @@ public class TransactionDto {
                 ", deal=" + deal +
                 ", floor=" + floor +
                 ", roadName='" + roadName + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
                 '}';
     }
 }
