@@ -1,256 +1,356 @@
 <script setup>
-import { ref } from "vue";
+import { useRouter } from "vue-router";
 
-// store import
-import { useLoginStore } from "@/stores/login.js";
+const router = useRouter();
 
-// login
-const loginStore = useLoginStore();
+
+// 로그인 함수
+const navigateToLogin = () => {
+  router.push('/login');
+};
 </script>
 
 <template>
   <div>
-    <nav
-      class="navbar navbar-expand-lg navbar-light px-5"
-      style="background-color: #e3f2fd"
-    >
-      <div class="container-fluid d-flex justify-content-between">
-        <!-- Logo -->
-        <a class="navbar-brand" href="#">OfficetelLink</a>
-
-        <!-- Toggle button for offcanvas sidebar -->
+    <!-- ======= Header/Navbar ======= -->
+    <nav class="navbar navbar-default navbar-trans navbar-expand-lg fixed-top">
+      <div class="container">
         <button
-          class="navbar-toggler"
+          class="navbar-toggler collapsed"
           type="button"
-          data-bs-toggle="offcanvas"
-          data-bs-target="#offcanvasNavbar"
-          aria-controls="offcanvasNavbar"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarDefault"
+          aria-controls="navbarDefault"
+          aria-expanded="false"
           aria-label="Toggle navigation"
         >
-          <span class="navbar-toggler-icon"></span>
+          <span></span>
+          <span></span>
+          <span></span>
         </button>
+        <a class="navbar-brand text-brand" href="/">OfficetelLink</a>
 
-        <!-- Offcanvas sidebar -->
-        <div
-          class="offcanvas offcanvas-end"
-          tabindex="-1"
-          id="offcanvasNavbar"
-          aria-labelledby="offcanvasNavbarLabel"
-          style="width: 250px"
-        >
-          <div class="offcanvas-header">
-            <h5
-              class="offcanvas-title"
-              id="offcanvasNavbarLabel"
-              style="vertical-align: inherit"
-            >
-              OfficetelLink
-            </h5>
-            <!-- 토글 닫는 버튼-->
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="offcanvas"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="offcanvas-body">
-            <hr class="d-lg-none text-black-50" />
-            <!-- Links -->
-            <a
-              class="nav-link fw-light"
-              aria-current="page"
-              href="#"
-              style="vertical-align: inherit"
-            >
-              홈
-            </a>
-            <a
-              class="nav-link fw-light"
-              href="#"
-              style="vertical-align: inherit"
-              >게시판
-            </a>
-          </div>
+        <div class="navbar-collapse collapse justify-content-center" id="navbarDefault">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <router-link class="nav-link" to="/" exact-active-class="active">Home</router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" to="/about" exact-active-class="active">About</router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" to="/property" exact-active-class="active">Property</router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" to="/blog" exact-active-class="active">Blog</router-link>
+      </li>
+      <li class="nav-item dropdown">
+        <a
+          class="nav-link dropdown-toggle"
+          href="#"
+          id="navbarDropdown"
+          role="button"
+          data-bs-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >Pages</a>
+        <div class="dropdown-menu">
+          <router-link class="dropdown-item" to="/property-single">Property Single</router-link>
+          <router-link class="dropdown-item" to="/blog-single">Blog Single</router-link>
+          <router-link class="dropdown-item" to="/agents-grid">Agents Grid</router-link>
+          <router-link class="dropdown-item" to="/agent-single">Agent Single</router-link>
         </div>
+      </li>
+    </ul>
+  </div>
 
-        <!-- Center search button, visible only on large screens -->
-        <button class="image-button d-none d-lg-block" type="button">
-          <img id="searchBarImg" src="../assets/search-bar.png" alt="Search" />
-        </button>
-
-        <!-- Right login button, visible only on large screens -->
         <button
-          class="image-button d-none d-lg-block"
-          type="button"
-          data-bs-toggle="modal"
-          data-bs-target="#loginModal"
+          class="image-button btn-b-n navbar-toggle-box navbar-toggle-box-collapse"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarTogglerDemo01"
+          @click="navigateToLogin"
         >
-          <img id="loginImg" src="../assets/login.png" alt="Login" />
+          <img
+            src="/src/assets/images/login-icon.png"
+            alt="login"
+            id="loginImg"
+            class="login-img"
+          />
         </button>
-      </div>
-
-      <!-- login Modal-->
-      <div
-        class="modal fade"
-        id="loginModal"
-        tabindex="-1"
-        aria-labelledby="loginModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title">OfficetelLink 시작하기</h1>
-            </div>
-            <div class="modal-body">
-              <form>
-                <div class="mb-3">
-                  <label for="email" class="form-label">아이디</label>
-                  <input
-                    type="email"
-                    class="form-control form-input"
-                    id="email"
-                    placeholder="이메일 주소를 입력해주세요"
-                    required
-                  />
-                </div>
-                <div class="mb-3">
-                  <label for="password" class="form-label">비밀번호</label>
-                  <input
-                    type="password"
-                    class="form-control form-input"
-                    id="password"
-                    placeholder="비밀번호를 입력해주세요"
-                    maxlength="15"
-                    required
-                  />
-                </div>
-                <button type="submit" class="btn btn-primary form-input">
-                  로그인
-                </button>
-              </form>
-              <div class="help-links">
-                <a href="#">아이디 찾기</a> | <a href="#">비밀번호 찾기</a>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <a class="btn btn-secondary form-input" href="#"
-                >처음 사용해요? 가입하기</a
-              >
-              <a
-                class="btn btn-secondary form-input"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                href="#"
-                >닫기</a
-              >
-            </div>
-          </div>
-        </div>
       </div>
     </nav>
+    <!-- End Header/Navbar -->
   </div>
 </template>
 
 <style scoped>
-.form-input {
-  width: 100%; /* Ensures full width inside their container */
+.nav-link.active {
+  color: #ff5733; /* 원하는 색상으로 변경 */
+  font-weight: bold;
 }
 
-.modal-dialog {
-  max-width: 400px; /* Restricting modal width for better focus */
+a {
+  color: #000000;
+  text-decoration: none;
+  transition: all 0.5s ease;
 }
 
-.modal-header,
-.modal-body,
-.modal-footer {
-  padding: 1rem; /* Consistent padding */
+a:hover {
+  color: #2eca6a;
+  text-decoration: none;
 }
 
-.modal-body .form-label {
-  display: block; /* Makes the label take the full line for clarity */
-  color: #6c757d; /* Grey color for form labels */
-  margin-bottom: 0.5rem; /* Space below the label */
-}
-
-.modal-body .form-control {
-  margin-bottom: 1rem; /* Space below each input field */
-}
-
-.modal-footer {
-  display: flex; /* Ensures the buttons in footer align correctly */
-  justify-content: center; /* Center aligns the buttons */
-  padding: 1rem;
-}
-
-.btn-primary,
-.btn-secondary {
-  width: 100%; /* Full width for buttons */
-  display: block; /* Ensures the button takes the full width available */
-}
-.btn-primary {
-  background-color: #007bff; /* Bootstrap primary blue */
-  border-color: #007bff;
-}
-.help-links a {
-  color: #007bff; /* Link color matching your primary color */
-}
-
-.btn-secondary {
-  background-color: #6c757d; /* Grey for secondary buttons */
-}
-
-.modal-dialog {
-  max-width: 400px; /* Restricting modal width for better focus */
-}
-.offcanvas-header {
-  padding-bottom: 0rem; /* Optional: adjust padding to fine-tune the spacing */
-}
-
-.offcanvas-body {
-  padding-top: 0rem; /* Reduces the top padding to bring contents closer to the header */
-}
-
-.nav-link:hover {
-  color: #007bff; /* Changes text color on hover */
-  font-weight: bold; /* Makes text bold on hover */
-
-  transition: color 0.3s ease, transform 0.3s ease; /* Smooth transition for color and transform */
-}
+/*--------------------------------------------------------------
+# Navbar
+--------------------------------------------------------------*/
 
 .image-button {
-  border: none;
-  background: none;
-  padding: 0;
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: none; /* 배경 제거 */
+  border: none; /* 테두리 제거 */
+  padding: 0; /* 여백 제거 */
+  cursor: pointer; /* 커서 모양 변경 */
 }
 
-#searchBarImg,
-#loginImg {
-  width: auto;
+.login-img {
+  width: 50px; /* 원하는 크기로 조정 */
   height: auto;
+  transition: transform 0.3s ease; /* 마우스를 올렸을 때의 애니메이션 효과 */
+}
+
+.login-img:hover {
+  transform: scale(1.1); /* 마우스를 올렸을 때 이미지가 커지는 효과 */
+}
+
+.navbar-default {
+  transition: all 0.5s ease-in-out;
+  background-color: #ffffff;
+  padding-top: 28px;
+  padding-bottom: 28px;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  box-shadow: 1px 2px 15px rgba(100, 100, 100, 0.3);
+}
+
+.navbar-default .nav-search {
+  color: #000000;
+  font-size: 1.5rem;
+}
+
+.navbar-default.navbar-reduce {
+  box-shadow: 1px 2px 15px rgba(100, 100, 100, 0.3);
+}
+
+.navbar-default.navbar-trans,
+.navbar-default.navbar-reduce {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.navbar-default.navbar-trans .nav-item,
+.navbar-default.navbar-reduce .nav-item {
+  position: relative;
+  padding-right: 10px;
+  padding-bottom: 8px;
+  margin-left: 0;
+}
+
+@media (min-width: 768px) {
+  .navbar-default.navbar-trans .nav-item,
+  .navbar-default.navbar-reduce .nav-item {
+    margin-left: 15px;
+  }
+}
+
+.navbar-default.navbar-trans .nav-link,
+.navbar-default.navbar-reduce .nav-link {
+  font-size: 1.1rem;
+  color: #000000;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  transition: all 0.1s ease-in-out;
+  position: relative;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.navbar-default.navbar-trans .nav-link:before,
+.navbar-default.navbar-reduce .nav-link:before {
+  content: "";
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  z-index: 0;
+  background-color: #2eca6a;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.2s ease-out, opacity 0.2s ease-out 0.3s;
+}
+
+.navbar-default.navbar-trans .nav-link:hover,
+.navbar-default.navbar-reduce .nav-link:hover {
+  color: #000000;
+}
+
+.navbar-default.navbar-trans .nav-link:hover:before,
+.navbar-default.navbar-reduce .nav-link:hover:before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.navbar-default.navbar-trans .show > .nav-link:before,
+.navbar-default.navbar-trans .active > .nav-link:before,
+.navbar-default.navbar-trans .nav-link.show:before,
+.navbar-default.navbar-trans .nav-link.active:before,
+.navbar-default.navbar-reduce .show > .nav-link:before,
+.navbar-default.navbar-reduce .active > .nav-link:before,
+.navbar-default.navbar-reduce .nav-link.show:before,
+.navbar-default.navbar-reduce .nav-link.active:before {
+  transform: scaleX(1);
+}
+
+.navbar-default.navbar-trans .nav-link:before {
+  background-color: #2eca6a;
+}
+
+.navbar-default.navbar-trans .nav-link:hover {
+  color: #000000;
+}
+
+.navbar-default.navbar-trans .show > .nav-link,
+.navbar-default.navbar-trans .active > .nav-link,
+.navbar-default.navbar-trans .nav-link.show,
+.navbar-default.navbar-trans .nav-link.active {
+  color: #000000;
+}
+
+.navbar-default.navbar-reduce {
+  transition: all 0.5s ease-in-out;
+  padding-top: 19px;
+  padding-bottom: 19px;
+}
+
+.navbar-default.navbar-reduce .nav-link {
+  color: #000000;
+}
+
+.navbar-default.navbar-reduce .nav-link:before {
+  background-color: #2eca6a;
+}
+
+.navbar-default.navbar-reduce .nav-link:hover {
+  color: #000000;
+}
+
+.navbar-default.navbar-reduce .show > .nav-link,
+.navbar-default.navbar-reduce .active > .nav-link,
+.navbar-default.navbar-reduce .nav-link.show,
+.navbar-default.navbar-reduce .nav-link.active {
+  color: #000000;
+}
+
+.navbar-default.navbar-reduce .navbar-brand {
+  color: #000000;
+}
+
+.navbar-default .dropdown .dropdown-menu {
+  border-top: 0;
+  border-left: 4px solid #2eca6a;
+  border-right: 0;
+  border-bottom: 0;
+  transform: translate3d(0px, 40px, 0px);
+  opacity: 0;
+  filter: alpha(opacity=0);
+  visibility: hidden;
+  transition: all 0.5s cubic-bezier(0.3, 0.65, 0.355, 1) 0s,
+    opacity 0.31s ease 0s, height 0s linear 0.36s;
+  margin: 0;
+  border-radius: 0;
+  padding: 12px 0;
+}
+
+@media (min-width: 768px) {
+  .navbar-default .dropdown .dropdown-menu {
+    border-top: 4px solid #2eca6a;
+    border-left: 0;
+    display: block;
+    position: absolute;
+    box-shadow: 0 2px rgba(17, 16, 15, 0.1), 0 2px 10px rgba(20, 19, 18, 0.1);
+  }
+}
+
+.navbar-default .dropdown .dropdown-menu .dropdown-item {
+  padding: 12px 18px;
+  transition: all 500ms ease;
+  font-weight: 600;
+  min-width: 220px;
+}
+
+.navbar-default .dropdown .dropdown-menu .dropdown-item:hover {
+  background-color: #ffffff;
+  color: #2eca6a;
+  transition: all 500ms ease;
+}
+
+.navbar-default .dropdown .dropdown-menu .dropdown-item.active {
+  background-color: #ffffff;
+  color: #2eca6a;
+}
+
+.navbar-default .dropdown:hover .dropdown-menu {
+  transform: translate3d(0px, 0px, 0px);
+  visibility: visible;
+  opacity: 1;
+  filter: alpha(opacity=1);
+}
+
+/*------/ Hamburger Navbar /------*/
+.navbar-toggler {
+  position: relative;
+}
+
+.navbar-toggler:focus,
+.navbar-toggler:active {
+  outline: 0;
+}
+
+.navbar-toggler span {
   display: block;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  background-color: #000000;
+  height: 3px;
+  width: 25px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  transform: rotate(0deg);
+  left: 0;
+  opacity: 1;
 }
 
-#searchBarImg:hover,
-#loginImg:hover {
-  opacity: 0.8;
-  transform: scale(1.05);
+.navbar-toggler span:nth-child(1),
+.navbar-toggler span:nth-child(3) {
+  transition: transform 0.35s ease-in-out;
 }
 
-#searchBarImg {
-  width: 300px;
+.navbar-toggler:not(.collapsed) span:nth-child(1) {
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  transform: rotate(135deg);
+  opacity: 0.9;
 }
 
-#loginImg {
-  width: 60px;
+.navbar-toggler:not(.collapsed) span:nth-child(2) {
+  height: 12px;
+  visibility: hidden;
+  background-color: transparent;
 }
 
-.nav-link {
-  margin-right: 15px; /* Right margin for nav items */
-  padding: 7px 0;
+.navbar-toggler:not(.collapsed) span:nth-child(3) {
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  transform: rotate(-135deg);
+  opacity: 0.9;
 }
 </style>

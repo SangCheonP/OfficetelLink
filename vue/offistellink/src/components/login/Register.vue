@@ -2,20 +2,13 @@
   <div class="limiter">
     <div class="container-login100">
       <div class="wrap-login100 row">
-        <div class="login100-pic js-tilt d-none d-lg-block col-lg-6" data-tilt>
-          <img src="@/assets/images/login-page-img.png" alt="IMG" />
-        </div>
-
         <form
-          class="login100-form validate-form col-12 col-lg-6 d-flex flex-column align-items-center justify-content-center"
+          class="login100-form validate-form col-12 col-lg-8 d-flex flex-column align-items-center justify-content-center"
           @submit.prevent="handleSubmit"
         >
-          <span class="login100-form-title"> 로그인 하기 </span>
+          <span class="login100-form-title"> 회원가입 하기 </span>
 
-          <div
-            class="wrap-input100 validate-input"
-            data-validate="Valid email is required: ex@abc.xyz"
-          >
+          <div class="wrap-input100 validate-input d-flex align-items-center" data-validate="Valid email is required: ex@abc.xyz">
             <input
               class="input100"
               type="text"
@@ -27,16 +20,43 @@
             <span class="symbol-input100">
               <i class="fa fa-envelope" aria-hidden="true"></i>
             </span>
+            <button @click.prevent="handleEmailVerification" class="email-verify-btn">인증</button>
           </div>
 
-          <div
-            class="wrap-input100 validate-input"
-            data-validate="Password is required"
-          >
+          <div class="wrap-input100 validate-input d-flex align-items-center" data-validate="Verification code is required">
+            <input
+              class="input100"
+              type="text"
+              name="verificationCode"
+              placeholder="Verification Code"
+              v-model="verificationCode"
+            />
+            <span class="focus-input100"></span>
+            <span class="symbol-input100">
+              <i class="fa fa-check" aria-hidden="true"></i>
+            </span>
+            <button @click.prevent="handleCodeVerification" class="code-verify-btn">체크</button>
+          </div>
+
+          <div class="wrap-input100 validate-input" data-validate="Name is required">
+            <input
+              class="input100"
+              type="text"
+              name="name"
+              placeholder="Name"
+              v-model="name"
+            />
+            <span class="focus-input100"></span>
+            <span class="symbol-input100">
+              <i class="fa fa-user" aria-hidden="true"></i>
+            </span>
+          </div>
+
+          <div class="wrap-input100 validate-input" data-validate="Password is required">
             <input
               class="input100"
               type="password"
-              name="pass"
+              name="password"
               placeholder="Password"
               v-model="password"
             />
@@ -46,18 +66,27 @@
             </span>
           </div>
 
+          <div class="wrap-input100 validate-input" data-validate="Phone number is required">
+            <input
+              class="input100"
+              type="text"
+              name="phone"
+              placeholder="Phone Number"
+              v-model="phone"
+            />
+            <span class="focus-input100"></span>
+            <span class="symbol-input100">
+              <i class="fa fa-phone" aria-hidden="true"></i>
+            </span>
+          </div>
+
           <div class="container-login100-form-btn">
-            <button class="login100-form-btn">Login</button>
+            <button class="login100-form-btn">Register</button>
           </div>
 
-          <div class="text-center p-t-12">
-            <span class="txt1"> Forgot </span>
-            <a class="txt2" href="#"> Username / Password? </a>
-          </div>
-
-          <div class="text-center p-t-136">
-            <a class="txt2" href="/register">
-              Create your Account
+          <div class="text-center p-t-36">
+            <a class="txt2" href="/login">
+              Already have an account? Login
               <i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
             </a>
           </div>
@@ -74,16 +103,34 @@ import { useRouter } from "vue-router";
 // Form data
 const email = ref("");
 const password = ref("");
+const name = ref("");
+const phone = ref("");
+const verificationCode = ref("");
 
 const router = useRouter();
 
 // Handle form submission
 const handleSubmit = () => {
-  // Implement your login logic here
+  // Implement your registration logic here
   console.log("Email:", email.value);
+  console.log("Verification Code:", verificationCode.value);
+  console.log("Name:", name.value);
   console.log("Password:", password.value);
+  console.log("Phone:", phone.value);
   // Redirect or show success message
   router.push("/");
+};
+
+// Handle email verification
+const handleEmailVerification = () => {
+  // Implement your email verification logic here
+  console.log("Email verification for:", email.value);
+};
+
+// Handle code verification
+const handleCodeVerification = () => {
+  // Implement your code verification logic here
+  console.log("Verification code:", verificationCode.value);
 };
 </script>
 
@@ -121,21 +168,13 @@ const handleSubmit = () => {
   padding: 55px 55px 37px 55px;
   box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.1);
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
   -moz-box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.1);
   -webkit-box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.1);
   -o-box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.1);
   -ms-box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.1);
-}
-
-.login100-pic {
-  width: 100%;
-  padding-right: 50px;
-}
-
-.login100-pic img {
-  max-width: 100%;
 }
 
 .login100-form {
@@ -219,6 +258,21 @@ const handleSubmit = () => {
   padding-left: 28px;
 }
 
+.email-verify-btn, .code-verify-btn {
+  font-size: 16px;
+  color: #fff;
+  background: #57b846;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.email-verify-btn:hover, .code-verify-btn:hover {
+  background: #333333;
+}
+
 .container-login100-form-btn {
   width: 100%;
   display: flex;
@@ -262,8 +316,8 @@ const handleSubmit = () => {
   padding-top: 12px;
 }
 
-.p-t-136 {
-  padding-top: 136px;
+.p-t-36 {
+  padding-top: 36px;
 }
 
 .txt1 {
