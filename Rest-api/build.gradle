@@ -35,8 +35,17 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3'
 
+    // swagger
     // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
     implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.4.0'
+
+    // email verification
+    implementation 'javax.mail:mail:1.4.7'
+    // Spring Context Support
+    implementation 'org.springframework:spring-context-support:5.3.9'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 }
 

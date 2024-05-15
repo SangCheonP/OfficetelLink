@@ -1,3 +1,55 @@
+<script setup>
+import axios from "axios";
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
+
+// Form data
+const email = ref("");
+const password = ref("");
+const name = ref("");
+const phone = ref("");
+const verificationCode = ref("");
+
+const router = useRouter();
+
+// 이메일 형식 검사
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const isEmailValid = computed(() => emailPattern.test(email.value));
+
+// Handle form submission
+const handleSubmit = () => {
+  if (!isEmailValid.value) {
+    alert("유효한 이메일을 입력하세요.");
+    return;
+  }
+  // Implement your registration logic here
+  console.log("Email:", email.value);
+  console.log("Verification Code:", verificationCode.value);
+  console.log("Name:", name.value);
+  console.log("Password:", password.value);
+  console.log("Phone:", phone.value);
+  // Redirect or show success message
+  router.push("/");
+};
+
+// 이메일 인증 코드 보내는 함수
+const sendEmailAuthenticationCode = () => {
+  if (isEmailValid.value === true) {
+    console.log("Email verification for:", email.value);
+    axios.post({});
+  } else {
+    alert("유효한 이메일을 입력하세요.");
+    return;
+  }
+};
+
+// Handle code verification
+const handleCodeVerification = () => {
+  // Implement your code verification logic here
+  console.log("Verification code:", verificationCode.value);
+};
+</script>
+
 <template>
   <div class="limiter">
     <div class="container-login100">
@@ -10,11 +62,12 @@
 
           <div
             class="wrap-input100 validate-input d-flex align-items-center"
+            :class="{ 'invalid-input': !isEmailValid && email.value }"
             data-validate="Valid email is required: ex@abc.xyz"
           >
             <input
               class="input100"
-              type="text"
+              type="email"
               name="email"
               placeholder="이메일"
               v-model="email"
@@ -24,11 +77,14 @@
               <i class="fa fa-envelope" aria-hidden="true"></i>
             </span>
             <button
-              @click.prevent="handleEmailVerification"
+              @click.prevent="sendEmailAuthenticationCode"
               class="email-verify-btn"
             >
               인증
             </button>
+          </div>
+          <div v-if="email.value && !isEmailValid" class="error-message">
+            유효한 이메일 형식을 입력하세요.
           </div>
 
           <div
@@ -111,7 +167,8 @@
 
           <div class="text-center p-t-36">
             <router-link class="txt2" :to="{ name: 'Login' }">
-              이미 계정이 있으신가요? 로그인 하러 가기
+              이미 계정이 있으신가요? <br />
+              로그인 하러 가기
               <i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
             </router-link>
           </div>
@@ -121,50 +178,22 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-
-// Form data
-const email = ref("");
-const password = ref("");
-const name = ref("");
-const phone = ref("");
-const verificationCode = ref("");
-
-const router = useRouter();
-
-// Handle form submission
-const handleSubmit = () => {
-  // Implement your registration logic here
-  console.log("Email:", email.value);
-  console.log("Verification Code:", verificationCode.value);
-  console.log("Name:", name.value);
-  console.log("Password:", password.value);
-  console.log("Phone:", phone.value);
-  // Redirect or show success message
-  router.push("/");
-};
-
-// Handle email verification
-const handleEmailVerification = () => {
-  // Implement your email verification logic here
-  console.log("Email verification for:", email.value);
-};
-
-// Handle code verification
-const handleCodeVerification = () => {
-  // Implement your code verification logic here
-  console.log("Verification code:", verificationCode.value);
-};
-</script>
-
 <style scoped>
 /* 기존 스타일 */
 
 @import url("https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css");
 @import url("https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css");
 @import url("https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css");
+
+.invalid-input input {
+  border-color: red;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.875em;
+  margin-top: 5px;
+}
 
 .limiter {
   width: 100%;
