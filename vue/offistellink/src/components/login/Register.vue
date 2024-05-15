@@ -10,43 +10,108 @@ const name = ref("");
 const phone = ref("");
 const verificationCode = ref("");
 
+// 이메일 인증에 성공했으면
+const checkedEmail = ref(false);
+
 const router = useRouter();
 
 // 이메일 형식 검사
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const isEmailValid = computed(() => emailPattern.test(email.value));
 
-// Handle form submission
+// 전화번호 형식 검사
+const phonePattern = /^(\d{3})-(\d{3,4})-(\d{4})$/;
+const isPhoneValid = computed(() => phonePattern.test(phone.value));
+
+// 가입하기
 const handleSubmit = () => {
+  const trimmedEmail = email.value.trim();
+  const trimmedName = name.value.trim();
+  const trimmedPassword = password.value.trim();
+  const trimmedPhone = phone.value.trim();
+
   if (!isEmailValid.value) {
     alert("유효한 이메일을 입력하세요.");
-    return;
+  } else if (!checkedEmail.value) {
+    alert("이메일을 인증해주세요.");
+  } else if (trimmedName.length === 0) {
+    alert("이름을 입력해주세요.");
+  } else if (trimmedPassword.length === 0) {
+    alert("비밀번호를 입력해주세요.");
+  } else if (!isPhoneValid.value) {
+    alert("유효한 전화번호를 입력하세요.");
+  } else {
+    console.log("Email:", trimmedEmail);
+    console.log("Verification Code:", verificationCode.value);
+    console.log("Name:", trimmedName);
+    console.log("Password:", trimmedPassword);
+    console.log("Phone:", trimmedPhone);
+    alert("가입에 성공했습니다.");
+
+    router.push("/");
   }
-  // Implement your registration logic here
-  console.log("Email:", email.value);
-  console.log("Verification Code:", verificationCode.value);
-  console.log("Name:", name.value);
-  console.log("Password:", password.value);
-  console.log("Phone:", phone.value);
-  // Redirect or show success message
-  router.push("/");
 };
 
 // 이메일 인증 코드 보내는 함수
 const sendEmailAuthenticationCode = () => {
-  if (isEmailValid.value === true) {
+  if (isEmailValid.value) {
     console.log("Email verification for:", email.value);
-    axios.post({});
+
+    axios
+      .post("http://localhost:8080/mail/sendAuthCode", {
+        mail: email.value,
+      })
+      .then((resp) => {
+        console.log("Response received:", resp);
+        alert("인증 코드가 전송되었습니다.");
+      })
+      .catch((error) => {
+        console.error("Error sending email authentication code:", error);
+        alert("인증 코드 전송 중 오류가 발생했습니다. 다시 시도해 주세요.");
+      });
   } else {
     alert("유효한 이메일을 입력하세요.");
-    return;
   }
 };
 
-// Handle code verification
-const handleCodeVerification = () => {
-  // Implement your code verification logic here
+// 인증 코드 체크
+const checkCodeVerification = () => {
+  const trimmedCode = verificationCode.value.trim();
   console.log("Verification code:", verificationCode.value);
+
+  if (trimmedCode.length > 0) {
+    axios
+      .post("http://localhost:8080/mail/checkAuthCode", {
+        mail: email.value,
+        authNum: trimmedCode,
+      })
+      .then((resp) => {
+        if (resp.data) {
+          checkedEmail.value = true;
+          console.log("Email verification successful.");
+          alert("인증이 완료되었습니다.");
+        } else {
+          checkedEmail.value = false;
+          console.log("Email verification failed:", resp.data);
+          alert("인증 코드가 틀렸습니다.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error during email verification:", error);
+        alert("인증 코드 확인 중 오류가 발생했습니다. 다시 시도해 주세요.");
+      });
+  } else {
+    alert("인증 코드를 입력해주세요.");
+  }
+};
+
+// 휴대폰 형식으로 바꿔줌
+const formatPhoneNumber = () => {
+  let cleaned = phone.value.replace(/\D/g, "");
+  let match = cleaned.match(/^(\d{3})(\d{3,4})(\d{4})$/);
+  if (match) {
+    phone.value = `${match[1]}-${match[2]}-${match[3]}`;
+  }
 };
 </script>
 
@@ -62,7 +127,7 @@ const handleCodeVerification = () => {
 
           <div
             class="wrap-input100 validate-input d-flex align-items-center"
-            :class="{ 'invalid-input': !isEmailValid && email.value }"
+            :class="{ 'invalid-input': !isEmailValid.value && email.value }"
             data-validate="Valid email is required: ex@abc.xyz"
           >
             <input
@@ -71,6 +136,7 @@ const handleCodeVerification = () => {
               name="email"
               placeholder="이메일"
               v-model="email"
+              autocomplete="off"
             />
             <span class="focus-input100"></span>
             <span class="symbol-input100">
@@ -83,7 +149,7 @@ const handleCodeVerification = () => {
               인증
             </button>
           </div>
-          <div v-if="email.value && !isEmailValid" class="error-message">
+          <div v-if="email.value && !isEmailValid.value" class="error-message">
             유효한 이메일 형식을 입력하세요.
           </div>
 
@@ -97,13 +163,14 @@ const handleCodeVerification = () => {
               name="verificationCode"
               placeholder="인증 코드"
               v-model="verificationCode"
+              autocomplete="off"
             />
             <span class="focus-input100"></span>
             <span class="symbol-input100">
               <i class="fa fa-check" aria-hidden="true"></i>
             </span>
             <button
-              @click.prevent="handleCodeVerification"
+              @click.prevent="checkCodeVerification"
               class="code-verify-btn"
             >
               체크
@@ -120,6 +187,7 @@ const handleCodeVerification = () => {
               name="name"
               placeholder="이름"
               v-model="name"
+              autocomplete="off"
             />
             <span class="focus-input100"></span>
             <span class="symbol-input100">
@@ -137,6 +205,7 @@ const handleCodeVerification = () => {
               name="password"
               placeholder="비밀번호"
               v-model="password"
+              autocomplete="off"
             />
             <span class="focus-input100"></span>
             <span class="symbol-input100">
@@ -154,6 +223,8 @@ const handleCodeVerification = () => {
               name="phone"
               placeholder="전화번호"
               v-model="phone"
+              autocomplete="off"
+              @input="formatPhoneNumber"
             />
             <span class="focus-input100"></span>
             <span class="symbol-input100">
