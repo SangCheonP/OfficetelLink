@@ -14,5 +14,16 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
+  },
+
+  //public json 파일 불러오기
+  server:{
+    proxy:{
+      '/officetel_transcation_data.json': {
+        target: 'http://localhost:5173',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/officetel_transcation_data.json/, '/public/officetel_transcation_data.json')
+      }
+    }
   }
 })
