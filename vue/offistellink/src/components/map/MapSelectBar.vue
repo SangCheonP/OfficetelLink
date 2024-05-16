@@ -89,7 +89,7 @@
 
 <script>
 export default {
-  name: 'SelectBar',
+  name: 'MapSelectBar',
   props: {
     selectedGu: String,
     selectedDong: String,

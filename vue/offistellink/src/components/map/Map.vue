@@ -1,10 +1,11 @@
 <template>
   <div>
     <header class="navbar navbar-expand navbar-dark bg-dark">
-      <br><br><br><br><br>
+      <br><br><br><br><br><br>
     </header>
 
     <div class="container-fluid mt-3">
+      <!-- 맵 필터링 기능 구역 -->
       <div class="row mb-3">
         <div class="col-12">
           <MapSelectBar
@@ -20,6 +21,7 @@
       </div>
 
       <div class="row">
+        <!-- 월별 시세 평균 추이 차트 구역 -->
         <div class="col-md-5 mb-3">
           <div class="card">
             <div class="card-body">
@@ -29,6 +31,7 @@
             </div>
           </div>
         </div>
+        <!-- 지도 api 및 클러스터링 -->
         <div class="col-md-7 mb-3">
           <div class="card">
             <div class="card-body">
@@ -247,11 +250,11 @@ export default {
       document.head.appendChild(script);
     };
 
+    // 검색 처리 로직
     const handleSearch = () => {
       console.log(`Selected Gu: ${selectedGu.value}`);
       console.log(`Selected Dong: ${selectedDong.value}`);
       console.log(`Selected Road: ${selectedRoad.value}`);
-      // 검색 처리 로직
     };
 
     return {

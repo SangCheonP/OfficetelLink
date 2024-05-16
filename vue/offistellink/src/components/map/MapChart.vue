@@ -18,7 +18,7 @@ import Chart from 'chart.js/auto';
 import axios from 'axios';
 
 export default {
-  name: 'MapChar',
+  name: 'MapChart',
   setup() {
     const initChart = (data) => {
       // Aggregate the data by month
