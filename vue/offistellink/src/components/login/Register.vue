@@ -41,36 +41,65 @@ const handleSubmit = () => {
   } else if (!isPhoneValid.value) {
     alert("유효한 전화번호를 입력하세요.");
   } else {
-    console.log("Email:", trimmedEmail);
-    console.log("Verification Code:", verificationCode.value);
-    console.log("Name:", trimmedName);
-    console.log("Password:", trimmedPassword);
-    console.log("Phone:", trimmedPhone);
-    alert("가입에 성공했습니다.");
+    console.log("이메일:", trimmedEmail);
+    console.log("인증 코드:", verificationCode.value);
+    console.log("이름:", trimmedName);
+    console.log("비밀번호:", trimmedPassword);
+    console.log("전화번호:", trimmedPhone);
 
-    router.push("/");
+    axios.post('http://localhost:8080/user/register', {
+      name: trimmedName,
+      email: trimmedEmail,
+      password: trimmedPassword,
+      phone: trimmedPhone
+    })
+    .then(response => {
+      alert("가입에 성공했습니다.");
+      router.push("/login");
+    })
+    .catch(error => {
+      console.error("가입 중 오류 발생:", error);
+      alert("가입 중 오류가 발생했습니다. 다시 시도해주세요.");
+    });
   }
 };
 
 // 이메일 인증 코드 보내는 함수
 const sendEmailAuthenticationCode = () => {
   if (isEmailValid.value) {
-    console.log("Email verification for:", email.value);
+    console.log("이메일 인증 중:", email.value);
 
+    // 등록된 이메일 목록 가져오기
     axios
-      .post("http://localhost:8080/mail/sendAuthCode", {
-        mail: email.value,
-      })
-      .then((resp) => {
-        console.log("Response received:", resp);
-        alert("인증 코드가 전송되었습니다.");
+      .get("http://localhost:8080/user/email")
+      .then((response) => {
+        const registeredEmails = response.data;
+        
+        // 이메일이 이미 등록되어 있는지 확인
+        if (registeredEmails.includes(email.value)) {
+          alert("이 이메일은 이미 등록되어 있습니다.");
+        } else {
+          // 인증 코드를 보내기
+          axios
+            .post("http://localhost:8080/mail/sendAuthCode", {
+              mail: email.value,
+            })
+            .then((resp) => {
+              console.log("응답 받음:", resp);
+              alert("인증 코드가 전송되었습니다.");
+            })
+            .catch((error) => {
+              console.error("이메일 인증 코드 전송 중 오류 발생:", error);
+              alert("인증 코드 전송 중 오류가 발생했습니다. 다시 시도해 주세요.");
+            });
+        }
       })
       .catch((error) => {
-        console.error("Error sending email authentication code:", error);
-        alert("인증 코드 전송 중 오류가 발생했습니다. 다시 시도해 주세요.");
+        console.error("등록된 이메일 목록 가져오는 중 오류 발생:", error);
+        alert("등록된 이메일 목록 확인 중 오류가 발생했습니다. 다시 시도해 주세요.");
       });
   } else {
-    alert("유효한 이메일을 입력하세요.");
+    alert("유효한 이메일을 입력해 주세요.");
   }
 };
 

@@ -15,7 +15,31 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
 
     @Override
-    public List<UserDto> getAllUsers() throws SQLException{
-        return userMapper.selectAll();
+    public List<UserDto> getAllUser() throws SQLException{
+        return userMapper.getAllUser();
+    }
+
+    @Override
+    public boolean addUser(UserDto userDto) {
+        int result = userMapper.addUser(userDto);
+        if(result == 1){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public List<String> getAllEmail() {
+        return userMapper.getAllEmail();
+    }
+
+    @Override
+    public UserDto login(UserDto userDto) throws Exception {
+        return null;
+    }
+
+    @Override
+    public void saveRefreshToken(String email, String refreshToken) throws Exception {
+
     }
 }

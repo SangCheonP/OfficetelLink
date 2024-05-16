@@ -1,4 +1,4 @@
-package com.ssafy.offistellink.mail.model.util;
+package com.ssafy.offistellink.util;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

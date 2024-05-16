@@ -7,11 +7,12 @@ import java.sql.Timestamp;
 @Data
 public class UserDto {
     private Integer id;
-    private String account;
     private String name;
     private String email;
     private String password;
     private String phone;
+    protected Integer point;
     private boolean admin;
-    private Timestamp created_at;
+    private Timestamp createdAt;
+    private String refreshToken;
 }

@@ -8,9 +8,8 @@ const password = ref("");
 
 const router = useRouter();
 
-// Handle form submission
-const handleSubmit = () => {
-  // Implement your login logic here
+// 로그인 함수
+const userLogion = () => {
   console.log("Email:", email.value);
   console.log("Password:", password.value);
   // Redirect or show success message
@@ -32,7 +31,7 @@ const handleSubmit = () => {
 
           <form
             class="login100-form validate-form col-12 col-lg-6 d-flex flex-column align-items-center justify-content-center"
-            @submit.prevent="handleSubmit"
+            @submit.prevent="userLogion"
           >
             <h1 class="login100-form-title">로그인</h1>
 

@@ -16,9 +16,33 @@
            - 만약 SQL문에 파라미터를 사용하려면 #{}을 사용하여 문자열 형태로 파라미터를 전달한다 (#{파라미터명} -> '파라미터값', 이때에 파라미터명은 DTO의 필드명과 일치시킨다.)
            - ${}를 사용하면 파라미터가 SQL쿼리문에 바로 출력된다. (이때에는 SQL Injection 공격에 취약하다.)
      -->
+
+    <resultMap id="user" type="UserDto">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="email" property="email"/>
+        <result column="password" property="password"/>
+        <result column="phone" property="phone"/>
+        <result column="point" property="point"/>
+        <result column="admin" property="admin"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
     <!--  모든 사용자를 조회한다. selectAll은 DAO인터페이스, EmployeeDao 클래스의 메소드 이름과 일치시킨다. -->
-    <select id="selectAll" resultType="UserDto">
+    <select id="getAllUser" resultMap="user">
         SELECT * FROM users;
+    </select>
+
+    <!-- 사용자 추가 -->
+    <insert id="addUser" parameterType="UserDto">
+        insert into users(name, email, password, phone)
+        value(#{name}, #{email}, #{password}, #{phone});
+    </insert>
+
+    <!-- 모든 사용자 이메일 가져옴 -->
+    <select id="getAllEmail" resultType="String">
+        select email
+        from users;
     </select>
 
 </mapper>
