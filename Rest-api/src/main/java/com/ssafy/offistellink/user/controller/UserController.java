@@ -7,8 +7,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -66,6 +68,7 @@ public class UserController {
     }
 
     // 로그인
+    // GET /user/login
     @Operation(summary = "로그인", description = "아이디와 비밀번호를 이용하여 로그인 처리")
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(
@@ -92,7 +95,7 @@ public class UserController {
                 resultMap.put("refresh-token", refreshToken);
 
                 status = HttpStatus.CREATED;
-            }else{
+            } else {
                 resultMap.put("message", "아이디 또는 패스워드를 확인해 주세요.");
                 status = HttpStatus.UNAUTHORIZED;
             }
@@ -100,6 +103,37 @@ public class UserController {
             log.debug("로그인 에러 발생 : {}", e);
             resultMap.put("message", e.getMessage());
             status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        return new ResponseEntity<Map<String, Object>>(resultMap, status);
+    }
+
+    @Operation(summary = "회원인증", description = "회원 정보를 담은 Token 을 반환한다.")
+    @GetMapping("/info/{email}")
+    public ResponseEntity<Map<String, Object>> getInfo(
+            @PathVariable("email") @Parameter(description = "인증할 회원의 이메일", required = true) String email,
+            HttpServletRequest request) {
+
+        Map<String, Object> resultMap = new HashMap<>();
+        HttpStatus status = HttpStatus.ACCEPTED;
+
+        System.out.println(request.getHeader("Authorization"));
+
+        if (jwtUtil.checkToken(request.getHeader("Authorization"))) {
+            log.info("사용 가능한 토큰!");
+            try {
+                // 로그인 사용자 정보
+                UserDto userDto = userService.userInfo(email);
+                resultMap.put("userInfo", userDto);
+                status = HttpStatus.OK;
+            } catch (Exception e) {
+                log.error("정보조회 실패 : {}", e);
+                resultMap.put("message", e.getMessage());
+                status = HttpStatus.INTERNAL_SERVER_ERROR;
+            }
+        }else{
+            log.error("사용 불가능 토큰!!!");
+            status = HttpStatus.UNAUTHORIZED;
         }
 
         return new ResponseEntity<Map<String, Object>>(resultMap, status);

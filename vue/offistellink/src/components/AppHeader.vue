@@ -1,12 +1,14 @@
 <script setup>
 import { useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
+import { useUserStore } from "@/stores/user";
 
 const router = useRouter();
 
-// 로그인 함수
-const navigateToLogin = () => {
-  router.push("/login");
-};
+const userStore = useUserStore();
+
+const { isLogin, userInfo, isValidToken } = storeToRefs(userStore);
+
 </script>
 
 <template>
@@ -32,7 +34,7 @@ const navigateToLogin = () => {
           <span></span>
           <span></span>
         </button>
-        <router-link class="navbar-brand text-brand" :to="{ name: 'Home' }"
+        <router-link class="navbar-brand text-brand" :to="{ name: 'home' }"
           >OfficetelLink</router-link
         >
 
@@ -44,7 +46,7 @@ const navigateToLogin = () => {
             <li class="nav-item">
               <router-link
                 class="nav-link"
-                :to="{ name: 'Home' }"
+                :to="{ name: 'home' }"
                 exact-active-class="active"
                 >Home</router-link
               >
@@ -99,23 +101,38 @@ const navigateToLogin = () => {
                 >
               </div>
             </li>
+            <li class="nav-item">
+              <router-link
+                class="nav-link"
+                :to="{name: 'user-mypage'}"
+                exact-active-class="active"
+                >MyPage</router-link
+              >
+            </li>
           </ul>
         </div>
 
-        <button
-          class="image-button btn-b-n navbar-toggle-box navbar-toggle-box-collapse"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarTogglerDemo01"
-          @click="navigateToLogin"
-        >
-          <img
-            src="/src/assets/images/login-icon.png"
-            alt="login"
-            id="loginImg"
-            class="login-img"
-          />
-        </button>
+        <router-link v-if="isLogin && isValidToken" :to= "{name: 'user-mypage'}">
+          <button
+            class="image-button btn-b-n navbar-toggle-box navbar-toggle-box-collapse"
+            type="button"
+          >
+            <img
+              src="/src/assets/images/login-icon.png"
+              alt="login"
+              id="loginImg"
+              class="login-img"
+            />
+          </button>
+        </router-link>
+        <router-link v-if="isLogin && isValidToken" :to= "{name: 'user-login'}">
+          <button
+            class="image-button btn-b-n navbar-toggle-box navbar-toggle-box-collapse"
+            type="button"
+          >
+            로그인
+          </button>
+        </router-link>
       </div>
     </nav>
     <!-- End Header/Navbar -->

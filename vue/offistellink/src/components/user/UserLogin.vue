@@ -1,121 +1,112 @@
+<!-- LoginComponent.vue -->
 <script setup>
 import { ref } from "vue";
+import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
-
-// Form data
-const email = ref("");
-const password = ref("");
+import { useUserStore } from "@/stores/user";
 
 const router = useRouter();
 
+const userStore = useUserStore();
+
+const { isLogin, isLoginError } = storeToRefs(userStore);
+const { userLogin, getUserInfo } = userStore;
+
+// Form data
+const loginUser = ref({
+  email: "",
+  password: "",
+});
+
 // 로그인 함수
-const userLogion = () => {
-  console.log("Email:", email.value);
-  console.log("Password:", password.value);
-  // Redirect or show success message
-  router.push("/");
+const login = async () => {
+  await userLogin(loginUser.value);
+
+  let token = sessionStorage.getItem("accessToken");
+
+  // console.log(token)
+  console.log("isLogin: " + isLogin.value);
+
+  if (isLogin.value) {
+    getUserInfo(token);
+    console.log();
+    // changeMenuState()
+    router.replace("/");
+  } else {
+    alert("다시 로그인 해주세요.");
+  }
+  // router.push("/");
 };
 </script>
 
 <template>
-  <div>
-    <div class="limiter">
-      <main class="container-login100">
-        <section class="wrap-login100 row">
-          <div
-            class="login100-pic js-tilt d-none d-lg-block col-lg-6"
-            data-tilt
-          >
-            <img src="@/assets/images/login-page-img.png" alt="IMG" />
-          </div>
-
-          <form
-            class="login100-form validate-form col-12 col-lg-6 d-flex flex-column align-items-center justify-content-center"
-            @submit.prevent="userLogion"
-          >
-            <h1 class="login100-form-title">로그인</h1>
-
-            <div
-              class="wrap-input100 validate-input"
-              data-validate="Valid email is required: ex@abc.xyz"
-            >
-              <input
-                class="input100"
-                type="text"
-                name="email"
-                placeholder="이메일"
-                v-model="email"
-              />
-              <span class="focus-input100"></span>
-              <span class="symbol-input100">
-                <i class="fa fa-envelope" aria-hidden="true"></i>
-              </span>
-            </div>
-
-            <div
-              class="wrap-input100 validate-input"
-              data-validate="Password is required"
-            >
-              <input
-                class="input100"
-                type="password"
-                name="pass"
-                placeholder="비밀번호"
-                v-model="password"
-              />
-              <span class="focus-input100"></span>
-              <span class="symbol-input100">
-                <i class="fa fa-lock" aria-hidden="true"></i>
-              </span>
-            </div>
-
-            <div class="container-login100-form-btn">
-              <button class="login100-form-btn">로그인</button>
-            </div>
-
-            <div class="text-center p-t-12">
-              <router-link class="txt2" href="#">
-                이메일 / 비밀번호 찾기
-              </router-link>
-            </div>
-
-            <div class="text-center p-t-36">
-              <router-link class="txt2" :to="{ name: 'Register' }">
-                계정 생성하기
-                <i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
-              </router-link>
-            </div>
-          </form>
-        </section>
-      </main>
+  <section class="wrap-login100 row">
+    <div class="login100-pic js-tilt d-none d-lg-block col-lg-6" data-tilt>
+      <img src="@/assets/images/login-page-img.png" alt="IMG" />
     </div>
-  </div>
+
+    <form
+      class="login100-form validate-form col-12 col-lg-6 d-flex flex-column align-items-center justify-content-center"
+      @submit.prevent="login"
+    >
+      <h1 class="login100-form-title">로그인</h1>
+
+      <div
+        class="wrap-input100 validate-input"
+        data-validate="Valid email is required: ex@abc.xyz"
+      >
+        <input
+          class="input100"
+          type="text"
+          name="email"
+          placeholder="이메일"
+          v-model="loginUser.email"
+        />
+        <span class="focus-input100"></span>
+        <span class="symbol-input100">
+          <i class="fa fa-envelope" aria-hidden="true"></i>
+        </span>
+      </div>
+
+      <div
+        class="wrap-input100 validate-input"
+        data-validate="Password is required"
+      >
+        <input
+          class="input100"
+          type="password"
+          name="pass"
+          placeholder="비밀번호"
+          v-model="loginUser.password"
+        />
+        <span class="focus-input100"></span>
+        <span class="symbol-input100">
+          <i class="fa fa-lock" aria-hidden="true"></i>
+        </span>
+      </div>
+
+      <div class="container-login100-form-btn">
+        <button class="login100-form-btn">로그인</button>
+      </div>
+
+      <div class="text-center p-t-12">
+        <router-link class="txt2" to="/"> 이메일 / 비밀번호 찾기 </router-link>
+      </div>
+
+      <div class="text-center p-t-36">
+        <router-link class="txt2" :to="{ name: 'user-register' }">
+          계정 생성하기
+          <i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
+        </router-link>
+      </div>
+    </form>
+  </section>
 </template>
 
 <style scoped>
 @import url("https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css");
 @import url("https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css");
 @import url("https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css");
-
-.limiter {
-  width: 100%;
-  margin: 0 auto;
-}
-
-.container-login100 {
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  padding: 15px;
-  background: #9053c7;
-  background: -webkit-linear-gradient(-135deg, #c850c0, #4158d0);
-  background: -o-linear-gradient(-135deg, #c850c0, #4158d0);
-  background: -moz-linear-gradient(-135deg, #c850c0, #4158d0);
-  background: linear-gradient(-135deg, #c850c0, #4158d0);
-}
 
 .wrap-login100 {
   width: 100%;

@@ -145,8 +145,6 @@ const formatPhoneNumber = () => {
 </script>
 
 <template>
-  <div class="limiter">
-    <div class="container-login100">
       <div class="wrap-login100 row">
         <form
           class="login100-form validate-form col-12 col-lg-6 d-flex flex-column align-items-center justify-content-center"
@@ -266,7 +264,7 @@ const formatPhoneNumber = () => {
           </div>
 
           <div class="text-center p-t-36">
-            <router-link class="txt2" :to="{ name: 'Login' }">
+            <router-link class="txt2" :to="{ name: 'user-login' }">
               이미 계정이 있으신가요? <br />
               로그인 하러 가기
               <i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
@@ -274,8 +272,6 @@ const formatPhoneNumber = () => {
           </div>
         </form>
       </div>
-    </div>
-  </div>
 </template>
 
 <style scoped>
@@ -295,25 +291,6 @@ const formatPhoneNumber = () => {
   margin-top: 5px;
 }
 
-.limiter {
-  width: 100%;
-  margin: 0 auto;
-}
-
-.container-login100 {
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  padding: 15px;
-  background: #9053c7;
-  background: -webkit-linear-gradient(-135deg, #c850c0, #4158d0);
-  background: -o-linear-gradient(-135deg, #c850c0, #4158d0);
-  background: -moz-linear-gradient(-135deg, #c850c0, #4158d0);
-  background: linear-gradient(-135deg, #c850c0, #4158d0);
-}
 
 .wrap-login100 {
   width: 60%;

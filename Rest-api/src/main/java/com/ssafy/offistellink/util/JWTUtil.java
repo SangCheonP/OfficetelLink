@@ -1,17 +1,16 @@
 package com.ssafy.offistellink.util;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Date;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
 
 @Component
 @Slf4j
@@ -51,7 +50,7 @@ public class JWTUtil {
                 // Header 설정 : 토큰의 타입, 해쉬 알고리즘 정보 세팅
                 .setHeaderParam("typ", "JWT").setClaims(claims)
                 // Signature 설정 : secret key를 활용한 암호화
-                .signWith(SignatureAlgorithm.ES256, this.generateKey())
+                .signWith(SignatureAlgorithm.HS256, this.generateKey())
                 .compact(); // 직렬화 처리.
 
         return jwt;

@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -15,12 +17,12 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
 
     @Override
-    public List<UserDto> getAllUser() throws SQLException{
+    public List<UserDto> getAllUser() throws Exception{
         return userMapper.getAllUser();
     }
 
     @Override
-    public boolean addUser(UserDto userDto) {
+    public boolean addUser(UserDto userDto) throws Exception{
         int result = userMapper.addUser(userDto);
         if(result == 1){
             return true;
@@ -29,17 +31,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<String> getAllEmail() {
+    public List<String> getAllEmail() throws Exception{
         return userMapper.getAllEmail();
     }
 
     @Override
     public UserDto login(UserDto userDto) throws Exception {
-        return null;
+        return userMapper.login(userDto);
+    }
+
+    @Override
+    public UserDto userInfo(String email) throws Exception {
+        return userMapper.userInfo(email);
     }
 
     @Override
     public void saveRefreshToken(String email, String refreshToken) throws Exception {
-
+        Map<String, String> map = new HashMap<>();
+        map.put("email", email);
+        map.put("refreshToken", refreshToken);
+        userMapper.saveRefreshToken(map);
     }
 }
