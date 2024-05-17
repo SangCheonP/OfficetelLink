@@ -1,7 +1,7 @@
 <template>
   <div>
     <header class="navbar navbar-expand navbar-dark bg-dark">
-      <br><br><br><br><br><br>
+      <br><br><br><br>
     </header>
 
     <div class="container-fluid mt-3">
@@ -137,19 +137,18 @@ export default {
         const markerImage = new window.kakao.maps.MarkerImage(markerImageSrc, imageSize, imageOption);
 
         // 데이터 불러오기 
-        axios.get("/officetel_transaction_data.json")
+        axios.get("http://localhost:8080/transactions")
           .then(response => {
             markersDataArray.value = response.data;
-            const markers = markersDataArray.value.map(markerData => {
+            const markers = markersDataArray.value.map(markerData => {     
               const markerPosition = new window.kakao.maps.LatLng(markerData.latitude, markerData.longitude);
               const marker = new window.kakao.maps.Marker({
                 position: markerPosition,
                 image: markerImage
               });
+              marker.dangiName = markerData.dangiName;
+              marker.bungi = markerData.bungi;
               marker.deal = markerData.deal;
-              marker.dangi_name = markerData.dangi_name; // 추가
-              marker.bungi = markerData.bungi; // 추가
-
               // 클러스터 마커 표시 
               window.kakao.maps.event.addListener(marker, 'mouseover', function() {
                 const content = 
@@ -187,7 +186,7 @@ export default {
                 } else {
                   const content = 
                     `<div style="padding:10px; background:rgba(255,255,255,0.9); color:#333; border-radius:10px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); font-size:14px; font-weight:bold;">
-                      단지 이름: ${marker.dangi_name}<br>
+                      단지 이름: ${marker.dangiName}<br>
                       번지: ${marker.bungi}<br>
                       거래가: ${marker.deal.toLocaleString()}만원
                     </div>`;
@@ -269,3 +268,26 @@ export default {
   }
 };
 </script>
+
+<style>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+th {
+  background-color: #f2f2f2;
+  text-align: left;
+}
+</style>

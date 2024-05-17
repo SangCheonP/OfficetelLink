@@ -2,8 +2,37 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssafy.offistellink.transaction.model.mapper.TransactionMapper">
 
-    <select id="selectAll" resultType="com.ssafy.offistellink.transaction.model.dto.TransactionDto">
-        SELECT * FROM transactions
+    <resultMap id="transactions" type="TransactionDto">
+        <result column="id" property="id"/>
+        <result column="sigungu" property="sigungu"/>
+        <result column="dangi_name" property="dangiName"/>
+        <result column="area" property="area"/>
+        <result column="contract_date" property="contractDate"/>
+        <result column="deal" property="deal"/>
+        <result column="floor" property="floor"/>
+        <result column="road_name" property="roadName"/>
+        <result column="latitude" property="latitude"/>
+        <result column="longitude" property="longitude"/>
+    </resultMap>
+    <!-- 거래 내역 전체 조회 -->
+    <select id="getAllTransactions" resultMap="transactions">
+        SELECT * FROM transactions;
     </select>
 
+    <!-- 구, 동, 도로명에 따른 조건 조회 -->
+    <select id="getTransactionByConditions" resultType="com.ssafy.offistellink.transaction.model.dto.TransactionSearchDto">
+        select *
+        from transactions
+        WHERE
+            SUBSTRING_INDEX(SUBSTRING_INDEX(sigungu, ' ', 2), ' ', -1) = #{gu}
+              AND SUBSTRING_INDEX(sigungu, ' ', -1) = #{dong}
+              AND road_name LIKE CONCAT('%', #{roadName}, '%');
+    </select>
+
+    <!-- 월별 시세 조회(date, deal) -->
+    <select id="getMonthMarketTrend" resultType="com.ssafy.offistellink.transaction.model.dto.TransactionTrendDto">
+        select contract_date,deal
+        from transactions
+        order by contract_date;
+    </select>
 </mapper>
