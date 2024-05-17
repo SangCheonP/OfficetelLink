@@ -8,7 +8,6 @@ const router = useRouter();
 const userStore = useUserStore();
 
 const { isLogin, userInfo, isValidToken } = storeToRefs(userStore);
-
 </script>
 
 <template>
@@ -54,7 +53,7 @@ const { isLogin, userInfo, isValidToken } = storeToRefs(userStore);
             <li class="nav-item">
               <router-link
                 class="nav-link"
-                to="/about"
+                :to="{name: 'home'}"
                 exact-active-class="active"
                 >About</router-link
               >
@@ -62,7 +61,7 @@ const { isLogin, userInfo, isValidToken } = storeToRefs(userStore);
             <li class="nav-item">
               <router-link
                 class="nav-link"
-                to="/property"
+                :to="{name: 'home'}"
                 exact-active-class="active"
                 >Property</router-link
               >
@@ -70,7 +69,7 @@ const { isLogin, userInfo, isValidToken } = storeToRefs(userStore);
             <li class="nav-item">
               <router-link
                 class="nav-link"
-                to="/blog"
+                :to="{name: 'home'}"
                 exact-active-class="active"
                 >Blog</router-link
               >
@@ -104,7 +103,7 @@ const { isLogin, userInfo, isValidToken } = storeToRefs(userStore);
             <li class="nav-item">
               <router-link
                 class="nav-link"
-                :to="{name: 'user-mypage'}"
+                :to="{ name: 'user-mypage' }"
                 exact-active-class="active"
                 >MyPage</router-link
               >
@@ -112,7 +111,10 @@ const { isLogin, userInfo, isValidToken } = storeToRefs(userStore);
           </ul>
         </div>
 
-        <router-link v-if="isLogin && isValidToken" :to= "{name: 'user-mypage'}">
+        <router-link
+          v-if="isLogin && isValidToken"
+          :to="{ name: 'user-mypage' }"
+        >
           <button
             class="image-button btn-b-n navbar-toggle-box navbar-toggle-box-collapse"
             type="button"
@@ -125,9 +127,12 @@ const { isLogin, userInfo, isValidToken } = storeToRefs(userStore);
             />
           </button>
         </router-link>
-        <router-link v-if="isLogin && isValidToken" :to= "{name: 'user-login'}">
+        <router-link
+          v-if="!isLogin && !isValidToken"
+          :to="{ name: 'user-login' }"
+        >
           <button
-            class="image-button btn-b-n navbar-toggle-box navbar-toggle-box-collapse"
+            class="image-button btn-b-n navbar-toggle-box navbar-toggle-box-collapse login-btn"
             type="button"
           >
             로그인
@@ -140,6 +145,21 @@ const { isLogin, userInfo, isValidToken } = storeToRefs(userStore);
 </template>
 
 <style scoped>
+/* 로그인 버튼 스타일 */
+.login-btn {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  border: #000000;
+  color: black;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.login-btn:hover {
+  color: #2eca6a;
+}
+
 .nav-link.active {
   color: #ff5733; /* 원하는 색상으로 변경 */
   font-weight: bold;
