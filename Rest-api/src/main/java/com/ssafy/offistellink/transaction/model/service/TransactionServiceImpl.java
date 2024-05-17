@@ -26,7 +26,7 @@ public class TransactionServiceImpl implements TransactionService{
         return transactionMapper.getTransactionByConditions(searchDto);
     }
     @Override
-    public List<TransactionTrendDto> getMonthMarketTrend(TransactionTrendDto trendDto) throws SQLException {
-        return transactionMapper.getMonthMarketTrend(trendDto);
+    public List<TransactionTrendDto> getMonthMarketTrend() throws SQLException {
+        return transactionMapper.getMonthMarketTrend();
     }
 }

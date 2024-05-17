@@ -12,5 +12,5 @@ public interface TransactionMapper {
 
     List<TransactionDto> getAllTransactions();
     List<TransactionSearchDto> getTransactionByConditions(TransactionSearchDto dto);
-    List<TransactionTrendDto> getMonthMarketTrend(TransactionTrendDto dto);
+    List<TransactionTrendDto> getMonthMarketTrend();
 }

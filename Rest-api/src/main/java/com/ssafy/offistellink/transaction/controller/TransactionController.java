@@ -48,8 +48,8 @@ public class TransactionController {
 
     @Operation(summary = "월별 월세 추이 조회", description = "날짜, 거래가")
     @GetMapping("/price")
-    public ResponseEntity<List<TransactionTrendDto>> monthlyTrend(@RequestBody TransactionTrendDto trendDto) throws SQLException {
-        List<TransactionTrendDto> trendDtoList = transactionService.getMonthMarketTrend(trendDto);
+    public ResponseEntity<List<TransactionTrendDto>> monthlyTrend() throws SQLException {
+        List<TransactionTrendDto> trendDtoList = transactionService.getMonthMarketTrend();
         if (trendDtoList.isEmpty()) {
             return ResponseEntity.noContent().build();
         } else {
