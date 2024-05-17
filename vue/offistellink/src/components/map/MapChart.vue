@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import Chart from 'chart.js/auto';
 import axios from 'axios';
 
@@ -21,24 +21,9 @@ export default {
   name: 'MapChart',
   setup() {
     const initChart = (data) => {
-      // Aggregate the data by month
-      const monthlyData = {};
-      data.forEach(item => {
-        const yearMonth = `${item.contrach_date.toString().slice(0, 4)}-${item.contrach_date.toString().slice(4, 6)}`;
-        if (!monthlyData[yearMonth]) {
-          monthlyData[yearMonth] = [];
-        }
-        monthlyData[yearMonth].push(item.deal);
-      });
-
-      // Calculate average deal per month and round to the nearest integer
-      const labels = Object.keys(monthlyData).sort();
-      const prices = labels.map(label => {
-        const deals = monthlyData[label];
-        const total = deals.reduce((acc, curr) => acc + curr, 0);
-        const average = total / deals.length;
-        return Math.round(average); // Round to nearest integer
-      });
+      // Prepare the data for the chart
+      const labels = data.map(item => item.contractDate);
+      const prices = data.map(item => item.avgDeal);
 
       // Initialize the chart
       const ctx = document.getElementById('priceTrendChart').getContext('2d');
@@ -47,7 +32,7 @@ export default {
         data: {
           labels: labels,
           datasets: [{
-            label: '월별 시세 추이',
+            label: '날짜별 시세 추이',
             data: prices,
             borderColor: 'rgba(75, 192, 192, 1)',
             backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -86,7 +71,7 @@ export default {
     };
 
     onMounted(() => {
-      axios.get('/officetel_transaction_data.json')
+      axios.get('http://localhost:8080/transactions/price')
         .then(response => {
           initChart(response.data);
         })
@@ -95,7 +80,7 @@ export default {
         });
     });
 
-    return { ref };
+    return {};
   }
 };
 </script>
