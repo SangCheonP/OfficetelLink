@@ -6,11 +6,13 @@ import com.ssafy.offistellink.transaction.model.dto.TransactionTrendDto;
 import com.ssafy.offistellink.transaction.model.service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.Console;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -36,7 +38,7 @@ public class TransactionController {
     }
 
     @Operation(summary = "조건에 맞는 오피스텔 조회", description = "구,동,도로명")
-    @GetMapping("/search")
+    @PostMapping("/search")
     public ResponseEntity<List<TransactionSearchDto>> listConditions(@RequestBody TransactionSearchDto searchDto) throws SQLException {
         List<TransactionSearchDto> searchDtoList = transactionService.getTransactionByConditions(searchDto);
         if (searchDtoList.isEmpty()) {

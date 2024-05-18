@@ -23,13 +23,22 @@
     </select>
 
     <!-- 구, 동, 도로명에 따른 조건 조회 -->
-    <select id="getTransactionByConditions" resultType="com.ssafy.offistellink.transaction.model.dto.TransactionSearchDto">
-        select *
+    <resultMap id="search" type="TransactionSearchDto">
+        <result column="gu" property="gu"/>
+        <result column="dong" property="dong"/>
+        <result column="road_name" property="roadName"/>
+    </resultMap>
+
+    <!-- 구, 동, 도로명에 따른 조건 조회 -->
+    <select id="getTransactionByConditions" parameterType="TransactionSearchDto" resultMap="search">
+        select SUBSTRING_INDEX(SUBSTRING_INDEX(sigungu, ' ', 2), ' ', -1) AS gu,
+               SUBSTRING_INDEX(sigungu, ' ', -1) AS dong,
+               road_name
         from transactions
         WHERE
-            SUBSTRING_INDEX(SUBSTRING_INDEX(sigungu, ' ', 2), ' ', -1) = #{gu}
-              AND SUBSTRING_INDEX(sigungu, ' ', -1) = #{dong}
-              AND road_name LIKE CONCAT('%', #{roadName}, '%');
+            substring_index(substring_index(sigungu, ' ', 2), ' ', -1) = #{gu}
+              AND substring_index(sigungu, ' ', -1) = #{dong}
+              AND road_name LIKE concat('%', #{roadName}, '%');
     </select>
 
     <!-- 월별 시세 조회 -->

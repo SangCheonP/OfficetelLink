@@ -11,6 +11,6 @@ import java.util.List;
 public interface TransactionMapper {
 
     List<TransactionDto> getAllTransactions();
-    List<TransactionSearchDto> getTransactionByConditions(TransactionSearchDto dto);
+    List<TransactionSearchDto> getTransactionByConditions(TransactionSearchDto searchDto);
     List<TransactionTrendDto> getMonthMarketTrend();
 }
