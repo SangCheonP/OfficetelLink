@@ -7,7 +7,13 @@ const router = useRouter();
 
 const userStore = useUserStore();
 
-const { isLogin, userInfo, isValidToken } = storeToRefs(userStore);
+const { isLogin, isValidToken } = storeToRefs(userStore);
+const { userLogout } = userStore;
+
+const logout = () => {
+  userLogout();
+  alert("로그아웃 되었습니다.");
+};
 </script>
 
 <template>
@@ -36,7 +42,6 @@ const { isLogin, userInfo, isValidToken } = storeToRefs(userStore);
         <router-link class="navbar-brand text-brand" :to="{ name: 'home' }"
           >OfficetelLink</router-link
         >
-
         <div
           class="navbar-collapse collapse justify-content-center"
           id="navbarDefault"
@@ -48,30 +53,6 @@ const { isLogin, userInfo, isValidToken } = storeToRefs(userStore);
                 :to="{ name: 'home' }"
                 exact-active-class="active"
                 >Home</router-link
-              >
-            </li>
-            <li class="nav-item">
-              <router-link
-                class="nav-link"
-                :to="{name: 'home'}"
-                exact-active-class="active"
-                >About</router-link
-              >
-            </li>
-            <li class="nav-item">
-              <router-link
-                class="nav-link"
-                :to="{name: 'home'}"
-                exact-active-class="active"
-                >Property</router-link
-              >
-            </li>
-            <li class="nav-item">
-              <router-link
-                class="nav-link"
-                :to="{name: 'home'}"
-                exact-active-class="active"
-                >Blog</router-link
               >
             </li>
             <li class="nav-item dropdown">
@@ -100,24 +81,16 @@ const { isLogin, userInfo, isValidToken } = storeToRefs(userStore);
                 >
               </div>
             </li>
-            <li class="nav-item">
-              <router-link
-                class="nav-link"
-                :to="{ name: 'user-mypage' }"
-                exact-active-class="active"
-                >MyPage</router-link
-              >
-            </li>
           </ul>
         </div>
 
-        <router-link
-          v-if="isLogin && isValidToken"
-          :to="{ name: 'user-mypage' }"
-        >
+        <div class="dropdown" v-if="isLogin && isValidToken">
           <button
             class="image-button btn-b-n navbar-toggle-box navbar-toggle-box-collapse"
             type="button"
+            data-bs-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
           >
             <img
               src="/src/assets/images/login-icon.png"
@@ -126,7 +99,19 @@ const { isLogin, userInfo, isValidToken } = storeToRefs(userStore);
               class="login-img"
             />
           </button>
-        </router-link>
+          <div class="dropdown-menu dropdown-menu-center">
+            <router-link class="dropdown-item" :to="{ name: 'user-mypage' }"
+              >마이페이지</router-link
+            >
+            <router-link
+              class="dropdown-item"
+              :to="{ name: 'home' }"
+              @click.prevent="logout"
+              >로그아웃</router-link
+            >
+          </div>
+        </div>
+
         <router-link
           v-if="!isLogin && !isValidToken"
           :to="{ name: 'user-login' }"
@@ -145,9 +130,13 @@ const { isLogin, userInfo, isValidToken } = storeToRefs(userStore);
 </template>
 
 <style scoped>
+.image-button {
+  position: relative;
+}
+
 /* 로그인 버튼 스타일 */
 .login-btn {
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 20px;
   font-weight: bold;
   border: #000000;
@@ -183,6 +172,7 @@ a:hover {
 --------------------------------------------------------------*/
 
 .image-button {
+  position: relative;
   background: none; /* 배경 제거 */
   border: none; /* 테두리 제거 */
   padding: 0; /* 여백 제거 */
@@ -363,7 +353,7 @@ a:hover {
   padding: 12px 18px;
   transition: all 500ms ease;
   font-weight: 600;
-  min-width: 220px;
+  min-width: 20px;
 }
 
 .navbar-default .dropdown .dropdown-menu .dropdown-item:hover {
@@ -433,7 +423,6 @@ a:hover {
   opacity: 0.9;
 }
 
-/* 추가된 부분: OfficetelLink 폰트 크기 조정 */
 .navbar-brand {
   font-size: 2rem; /* 원하는 폰트 크기로 조정 */
 }

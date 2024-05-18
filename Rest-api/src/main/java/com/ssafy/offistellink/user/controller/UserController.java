@@ -108,6 +108,8 @@ public class UserController {
         return new ResponseEntity<Map<String, Object>>(resultMap, status);
     }
 
+    //  회원인증
+    // GET /user/info/{email}
     @Operation(summary = "회원인증", description = "회원 정보를 담은 Token 을 반환한다.")
     @GetMapping("/info/{email}")
     public ResponseEntity<Map<String, Object>> getInfo(
@@ -116,8 +118,6 @@ public class UserController {
 
         Map<String, Object> resultMap = new HashMap<>();
         HttpStatus status = HttpStatus.ACCEPTED;
-
-        System.out.println(request.getHeader("Authorization"));
 
         if (jwtUtil.checkToken(request.getHeader("Authorization"))) {
             log.info("사용 가능한 토큰!");
@@ -131,9 +131,57 @@ public class UserController {
                 resultMap.put("message", e.getMessage());
                 status = HttpStatus.INTERNAL_SERVER_ERROR;
             }
-        }else{
+        } else {
             log.error("사용 불가능 토큰!!!");
             status = HttpStatus.UNAUTHORIZED;
+        }
+
+        return new ResponseEntity<Map<String, Object>>(resultMap, status);
+    }
+
+    // A/T 재발급
+    // POST /user/refresh
+    @Operation(summary = "Access Token 재발급", description = "만료된 access token 을 재발급 받는다.")
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestBody UserDto userDto, HttpServletRequest request)
+            throws Exception {
+        Map<String, Object> resultMap = new HashMap<>();
+        HttpStatus status = HttpStatus.ACCEPTED;
+        String token = request.getHeader("refreshToken");
+        log.debug("token : {}, userDto : {}", token, userDto);
+
+        // DB에 저장되어 있는 refresh token과 비교 후 재발급
+        if (jwtUtil.checkToken(token)) {
+            if (token.equals(userService.getRefreshToken(userDto.getEmail()))) {
+                String accessToken = jwtUtil.createAccessToken(userDto.getEmail());
+
+                log.debug("token : {}", accessToken);
+                log.debug("정상적으로 access token 재발급!!!");
+
+                resultMap.put("access-token", accessToken);
+
+                status = HttpStatus.CREATED;
+            }
+        } else {
+            log.debug("refresh token 도 사용 불가!!!!!!!");
+            status = HttpStatus.UNAUTHORIZED;
+        }
+        return new ResponseEntity<Map<String, Object>>(resultMap, status);
+    }
+
+    @Operation(summary = "로그아웃", description = "회원 정보를 담은 Token 을 제거한다.")
+    @GetMapping("/logout/{email}")
+    public ResponseEntity<?> removeToken(@PathVariable ("email") @Parameter(description = "로그아웃 할 회원의 이메일", required = true) String email){
+        Map<String, Object> resultMap = new HashMap<>();
+        HttpStatus status = HttpStatus.ACCEPTED;
+
+        try{
+            userService.deleteRefreshToken(email);
+            status = HttpStatus.OK;
+        }catch (Exception e){
+            log.error("로그아웃 실패 : {}", e);
+            resultMap.put("message", e.getMessage());
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
 
         return new ResponseEntity<Map<String, Object>>(resultMap, status);

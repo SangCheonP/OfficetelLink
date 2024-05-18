@@ -12,4 +12,6 @@ public interface UserService {
     UserDto login(UserDto userDto) throws Exception;
     UserDto userInfo(String email) throws Exception;
     void saveRefreshToken(String email, String refreshToken) throws Exception;
+    Object getRefreshToken(String email) throws Exception;
+    void deleteRefreshToken(String email) throws Exception;
 }

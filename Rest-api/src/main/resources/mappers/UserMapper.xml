@@ -63,4 +63,16 @@
         set refresh_token = #{refreshToken}
         where email = #{email};
     </update>
+
+    <select id="getRefreshToken" parameterType="string" resultType="string">
+        select refresh_token
+        from users
+        where email = #{email};
+    </select>
+
+    <update id="deleteRefreshToken" parameterType="map">
+        update users
+        set refresh_token = #{refreshToken, jdbcType=VARCHAR}
+        where email = #{email};
+    </update>
 </mapper>
