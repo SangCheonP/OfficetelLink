@@ -12,4 +12,14 @@ async function findByEmail(email, success, fail) {
   await local.get(`/user/info/${email}`).then(success).catch(fail);
 }
 
-export { userConfirm, findByEmail };
+async function tokenRegeneration(user, success, fail) {
+  local.defaults.headers["refreshToken"] =
+    sessionStorage.getItem("refreshToken");
+  await local.post(`/user/refresh`, user).then(success).catch(fail);
+}
+
+async function logout(email, success, fail) {
+  await local.get(`/user/logout/${email}`).then(success).catch(fail);
+}
+
+export { userConfirm, findByEmail, tokenRegeneration, logout };

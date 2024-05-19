@@ -52,4 +52,17 @@ public class UserServiceImpl implements UserService {
         map.put("refreshToken", refreshToken);
         userMapper.saveRefreshToken(map);
     }
+
+    @Override
+    public Object getRefreshToken(String email) throws Exception {
+        return userMapper.getRefreshToken(email);
+    }
+
+    @Override
+    public void deleteRefreshToken(String email) throws Exception {
+        Map<String, String> map = new HashMap<>();
+        map.put("email", email);
+        map.put("refreshToken", null);
+        userMapper.deleteRefreshToken(map);
+    }
 }
