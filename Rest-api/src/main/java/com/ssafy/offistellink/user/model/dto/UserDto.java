@@ -25,4 +25,7 @@ public class UserDto {
     private Timestamp createdAt;
     @Schema(description = "refreshToken")
     private String refreshToken;
+    @Schema(description = "프로필 이미지 URL")
+    private String profileImageUrl;
 }
+

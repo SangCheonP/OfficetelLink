@@ -5,20 +5,22 @@ import com.ssafy.offistellink.user.model.service.UserService;
 import com.ssafy.offistellink.util.JWTUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.UUID;
 
 @Tag(name = "User", description = "유저 정보 관리")
 @RequestMapping("/user")
@@ -186,4 +188,61 @@ public class UserController {
 
         return new ResponseEntity<Map<String, Object>>(resultMap, status);
     }
+
+    @Operation(summary = "프로필 이미지 변경", description = "마이페이지 프로필 이미지를 변경한다.")
+    @PostMapping("/{email}/profileimage")
+    public ResponseEntity<Map<String, Object>> uploadProfileImage(
+            @PathVariable("email") String email,
+            @RequestParam("image") MultipartFile image) {
+
+        Map<String, Object> resultMap = new HashMap<>();
+        HttpStatus status = HttpStatus.ACCEPTED;
+
+        try {
+            // 업로드 디렉토리 절대 경로 설정
+            String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/images/profiles/";
+            File uploadDirectory = new File(uploadDir);
+            if (!uploadDirectory.exists()) {
+                uploadDirectory.mkdirs(); // 디렉토리 생성
+            }
+
+            // 기존 이미지 URL 조회
+            String oldImageUrl = userService.getProfileImageUrl(email);
+            if (oldImageUrl != null) {
+                // 기존 파일 삭제
+                File oldFile = new File(uploadDir + oldImageUrl.substring(oldImageUrl.lastIndexOf("/") + 1));
+                if (oldFile.exists()) {
+                    oldFile.delete();
+                }
+            }
+
+            // 파일명 안전하게 처리
+            String originalFilename = image.getOriginalFilename();
+            String safeFilename = originalFilename.replaceAll("[^a-zA-Z0-9.-]", "_"); // 특수문자 대체
+            String uniqueFilename = UUID.randomUUID().toString() + "_" + safeFilename;
+
+            // 이미지 저장 경로 설정
+            String imagePath = uploadDir + uniqueFilename;
+            File file = new File(imagePath);
+            image.transferTo(file); // 이미지 파일 저장
+
+            // 이미지 URL 생성
+//            String baseUrl = "http://localhost:8080"; // 도메인 및 포트 설정
+            String imageUrl = "/images/profiles/" + uniqueFilename;
+            userService.updateProfileImageUrl(email, imageUrl); // 사용자 이미지 URL 업데이트
+
+            // 성공 메시지와 이미지 URL 추가
+            resultMap.put("message", "프로필 이미지가 성공적으로 업로드되었습니다.");
+            resultMap.put("imageUrl", imageUrl);
+
+            status = HttpStatus.OK;
+        } catch (Exception e) {
+            log.error("이미지 업로드 실패 : {}", e); // 에러 로그
+            resultMap.put("message", e.getMessage()); // 에러 메시지 추가
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        return new ResponseEntity<>(resultMap, status); // 응답 반환
+    }
+
 }

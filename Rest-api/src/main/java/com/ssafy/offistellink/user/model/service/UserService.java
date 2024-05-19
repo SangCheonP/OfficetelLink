@@ -14,4 +14,6 @@ public interface UserService {
     void saveRefreshToken(String email, String refreshToken) throws Exception;
     Object getRefreshToken(String email) throws Exception;
     void deleteRefreshToken(String email) throws Exception;
+    void updateProfileImageUrl(String email, String imageUrl) throws Exception;
+    String getProfileImageUrl(String email) throws Exception;
 }

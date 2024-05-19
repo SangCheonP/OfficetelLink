@@ -65,4 +65,17 @@ public class UserServiceImpl implements UserService {
         map.put("refreshToken", null);
         userMapper.deleteRefreshToken(map);
     }
+
+    @Override
+    public void updateProfileImageUrl(String email, String imageUrl) throws Exception {
+        Map<String, String> map = new HashMap<>();
+        map.put("email", email);
+        map.put("url", imageUrl);
+        userMapper.updateProfileImageUrl(map);
+    }
+
+    @Override
+    public String getProfileImageUrl(String email) throws Exception {
+        return userMapper.getProfileImageUrl(email);
+    }
 }

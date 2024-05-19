@@ -22,4 +22,15 @@ async function logout(email, success, fail) {
   await local.get(`/user/logout/${email}`).then(success).catch(fail);
 }
 
-export { userConfirm, findByEmail, tokenRegeneration, logout };
+async function imageUpdate(email, image, success, fail) {
+  await local
+    .post(`/user/${email}/profileimage`, image, {
+      headers: {
+        "Content-Type": "multipart/form-data", // Content-Type 설정
+      },
+    })
+    .then(success)
+    .catch(fail); // 성공 및 실패 콜백 설정
+}
+
+export { userConfirm, findByEmail, tokenRegeneration, logout, imageUpdate };

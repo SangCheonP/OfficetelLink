@@ -47,20 +47,21 @@ const handleSubmit = () => {
     console.log("비밀번호:", trimmedPassword);
     console.log("전화번호:", trimmedPhone);
 
-    axios.post('http://localhost:8080/user/register', {
-      name: trimmedName,
-      email: trimmedEmail,
-      password: trimmedPassword,
-      phone: trimmedPhone
-    })
-    .then(response => {
-      alert("가입에 성공했습니다.");
-      router.push("/login");
-    })
-    .catch(error => {
-      console.error("가입 중 오류 발생:", error);
-      alert("가입 중 오류가 발생했습니다. 다시 시도해주세요.");
-    });
+    axios
+      .post("http://localhost:8080/user/register", {
+        name: trimmedName,
+        email: trimmedEmail,
+        password: trimmedPassword,
+        phone: trimmedPhone,
+      })
+      .then((response) => {
+        alert("가입에 성공했습니다.");
+        router.push("/login");
+      })
+      .catch((error) => {
+        console.error("가입 중 오류 발생:", error);
+        alert("가입 중 오류가 발생했습니다. 다시 시도해주세요.");
+      });
   }
 };
 
@@ -74,7 +75,7 @@ const sendEmailAuthenticationCode = () => {
       .get("http://localhost:8080/user/email")
       .then((response) => {
         const registeredEmails = response.data;
-        
+
         // 이메일이 이미 등록되어 있는지 확인
         if (registeredEmails.includes(email.value)) {
           alert("이 이메일은 이미 등록되어 있습니다.");
@@ -90,13 +91,17 @@ const sendEmailAuthenticationCode = () => {
             })
             .catch((error) => {
               console.error("이메일 인증 코드 전송 중 오류 발생:", error);
-              alert("인증 코드 전송 중 오류가 발생했습니다. 다시 시도해 주세요.");
+              alert(
+                "인증 코드 전송 중 오류가 발생했습니다. 다시 시도해 주세요."
+              );
             });
         }
       })
       .catch((error) => {
         console.error("등록된 이메일 목록 가져오는 중 오류 발생:", error);
-        alert("등록된 이메일 목록 확인 중 오류가 발생했습니다. 다시 시도해 주세요.");
+        alert(
+          "등록된 이메일 목록 확인 중 오류가 발생했습니다. 다시 시도해 주세요."
+        );
       });
   } else {
     alert("유효한 이메일을 입력해 주세요.");
@@ -145,133 +150,130 @@ const formatPhoneNumber = () => {
 </script>
 
 <template>
-      <div class="wrap-login100 row">
-        <form
-          class="login100-form validate-form col-12 col-lg-6 d-flex flex-column align-items-center justify-content-center"
-          @submit.prevent="handleSubmit"
+  <div class="wrap-login100 row">
+    <form
+      class="login100-form validate-form col-12 col-lg-6 d-flex flex-column align-items-center justify-content-center"
+      @submit.prevent="handleSubmit"
+    >
+      <span class="login100-form-title"> 회원가입 </span>
+
+      <div
+        class="wrap-input100 validate-input d-flex align-items-center"
+        :class="{ 'invalid-input': !isEmailValid.value && email.value }"
+        data-validate="Valid email is required: ex@abc.xyz"
+      >
+        <input
+          class="input100"
+          type="email"
+          name="email"
+          placeholder="이메일"
+          v-model="email"
+          autocomplete="off"
+        />
+        <span class="focus-input100"></span>
+        <span class="symbol-input100">
+          <i class="fa fa-envelope" aria-hidden="true"></i>
+        </span>
+        <button
+          @click.prevent="sendEmailAuthenticationCode"
+          class="email-verify-btn"
         >
-          <span class="login100-form-title"> 회원가입 </span>
-
-          <div
-            class="wrap-input100 validate-input d-flex align-items-center"
-            :class="{ 'invalid-input': !isEmailValid.value && email.value }"
-            data-validate="Valid email is required: ex@abc.xyz"
-          >
-            <input
-              class="input100"
-              type="email"
-              name="email"
-              placeholder="이메일"
-              v-model="email"
-              autocomplete="off"
-            />
-            <span class="focus-input100"></span>
-            <span class="symbol-input100">
-              <i class="fa fa-envelope" aria-hidden="true"></i>
-            </span>
-            <button
-              @click.prevent="sendEmailAuthenticationCode"
-              class="email-verify-btn"
-            >
-              인증
-            </button>
-          </div>
-          <div v-if="email.value && !isEmailValid.value" class="error-message">
-            유효한 이메일 형식을 입력하세요.
-          </div>
-
-          <div
-            class="wrap-input100 validate-input d-flex align-items-center"
-            data-validate="Verification code is required"
-          >
-            <input
-              class="input100"
-              type="text"
-              name="verificationCode"
-              placeholder="인증 코드"
-              v-model="verificationCode"
-              autocomplete="off"
-            />
-            <span class="focus-input100"></span>
-            <span class="symbol-input100">
-              <i class="fa fa-check" aria-hidden="true"></i>
-            </span>
-            <button
-              @click.prevent="checkCodeVerification"
-              class="code-verify-btn"
-            >
-              체크
-            </button>
-          </div>
-
-          <div
-            class="wrap-input100 validate-input"
-            data-validate="Name is required"
-          >
-            <input
-              class="input100"
-              type="text"
-              name="name"
-              placeholder="이름"
-              v-model="name"
-              autocomplete="off"
-            />
-            <span class="focus-input100"></span>
-            <span class="symbol-input100">
-              <i class="fa fa-user" aria-hidden="true"></i>
-            </span>
-          </div>
-
-          <div
-            class="wrap-input100 validate-input"
-            data-validate="Password is required"
-          >
-            <input
-              class="input100"
-              type="password"
-              name="password"
-              placeholder="비밀번호"
-              v-model="password"
-              autocomplete="off"
-            />
-            <span class="focus-input100"></span>
-            <span class="symbol-input100">
-              <i class="fa fa-lock" aria-hidden="true"></i>
-            </span>
-          </div>
-
-          <div
-            class="wrap-input100 validate-input"
-            data-validate="Phone number is required"
-          >
-            <input
-              class="input100"
-              type="text"
-              name="phone"
-              placeholder="전화번호"
-              v-model="phone"
-              autocomplete="off"
-              @input="formatPhoneNumber"
-            />
-            <span class="focus-input100"></span>
-            <span class="symbol-input100">
-              <i class="fa fa-phone" aria-hidden="true"></i>
-            </span>
-          </div>
-
-          <div class="container-login100-form-btn">
-            <button class="login100-form-btn">가입하기</button>
-          </div>
-
-          <div class="text-center p-t-36">
-            <router-link class="txt2" :to="{ name: 'user-login' }">
-              이미 계정이 있으신가요? <br />
-              로그인 하러 가기
-              <i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
-            </router-link>
-          </div>
-        </form>
+          인증
+        </button>
       </div>
+      <div v-if="email.value && !isEmailValid.value" class="error-message">
+        유효한 이메일 형식을 입력하세요.
+      </div>
+
+      <div
+        class="wrap-input100 validate-input d-flex align-items-center"
+        data-validate="Verification code is required"
+      >
+        <input
+          class="input100"
+          type="text"
+          name="verificationCode"
+          placeholder="인증 코드"
+          v-model="verificationCode"
+          autocomplete="off"
+        />
+        <span class="focus-input100"></span>
+        <span class="symbol-input100">
+          <i class="fa fa-check" aria-hidden="true"></i>
+        </span>
+        <button @click.prevent="checkCodeVerification" class="code-verify-btn">
+          체크
+        </button>
+      </div>
+
+      <div
+        class="wrap-input100 validate-input"
+        data-validate="Name is required"
+      >
+        <input
+          class="input100"
+          type="text"
+          name="name"
+          placeholder="이름"
+          v-model="name"
+          autocomplete="off"
+        />
+        <span class="focus-input100"></span>
+        <span class="symbol-input100">
+          <i class="fa fa-user" aria-hidden="true"></i>
+        </span>
+      </div>
+
+      <div
+        class="wrap-input100 validate-input"
+        data-validate="Password is required"
+      >
+        <input
+          class="input100"
+          type="password"
+          name="password"
+          placeholder="비밀번호"
+          v-model="password"
+          autocomplete="off"
+        />
+        <span class="focus-input100"></span>
+        <span class="symbol-input100">
+          <i class="fa fa-lock" aria-hidden="true"></i>
+        </span>
+      </div>
+
+      <div
+        class="wrap-input100 validate-input"
+        data-validate="Phone number is required"
+      >
+        <input
+          class="input100"
+          type="text"
+          name="phone"
+          placeholder="전화번호"
+          v-model="phone"
+          autocomplete="off"
+          @input="formatPhoneNumber"
+        />
+        <span class="focus-input100"></span>
+        <span class="symbol-input100">
+          <i class="fa fa-phone" aria-hidden="true"></i>
+        </span>
+      </div>
+
+      <div class="container-login100-form-btn">
+        <button class="login100-form-btn">가입하기</button>
+      </div>
+
+      <div class="text-center p-t-36">
+        <router-link class="txt2" :to="{ name: 'user-login' }">
+          이미 계정이 있으신가요? <br />
+          로그인 하러 가기
+          <i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
+        </router-link>
+      </div>
+    </form>
+  </div>
 </template>
 
 <style scoped>
@@ -291,14 +293,14 @@ const formatPhoneNumber = () => {
   margin-top: 5px;
 }
 
-
 .wrap-login100 {
   width: 60%;
-  max-width: 960px;
+  max-width: 800px;
   background: #fff;
   border-radius: 10px;
   overflow: hidden;
-  padding: 55px 55px 37px 55px;
+  margin-top: 30px;
+  padding: 45px 0;
   box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
@@ -327,7 +329,7 @@ const formatPhoneNumber = () => {
 
 .wrap-input100 {
   position: relative;
-  width: 120%;
+  width: 100%;
   z-index: 1;
   margin-bottom: 20px;
   display: flex; /* Flexbox 추가 */
@@ -393,7 +395,7 @@ const formatPhoneNumber = () => {
 }
 
 .container-login100-form-btn {
-  width: 120%;
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;

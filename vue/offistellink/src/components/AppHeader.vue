@@ -7,7 +7,7 @@ const router = useRouter();
 
 const userStore = useUserStore();
 
-const { isLogin, isValidToken } = storeToRefs(userStore);
+const { isLogin, isValidToken, userInfo } = storeToRefs(userStore);
 const { userLogout } = userStore;
 
 const logout = () => {
@@ -93,7 +93,9 @@ const logout = () => {
             aria-expanded="false"
           >
             <img
-              src="/src/assets/images/login-icon.png"
+              :src="`http://localhost:8080${
+                userInfo.profileImageUrl
+              }?t=${Date.now()}`"
               alt="login"
               id="loginImg"
               class="login-img"
@@ -182,6 +184,8 @@ a:hover {
 .login-img {
   width: 50px; /* 원하는 크기로 조정 */
   height: auto;
+  border-radius: 50%;
+  border: 2px solid rgb(0, 0, 0, 0.3);
   transition: transform 0.3s ease; /* 마우스를 올렸을 때의 애니메이션 효과 */
 }
 

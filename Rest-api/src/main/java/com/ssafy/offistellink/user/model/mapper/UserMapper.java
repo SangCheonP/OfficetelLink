@@ -14,5 +14,7 @@ public interface UserMapper {
     UserDto userInfo(String email) throws SQLException;
     void saveRefreshToken(Map<String, String> map) throws SQLException;
     Object getRefreshToken(String email) throws SQLException;
-    public void deleteRefreshToken(Map<String, String> map) throws SQLException;
+    void deleteRefreshToken(Map<String, String> map) throws SQLException;
+    void updateProfileImageUrl(Map<String, String> map) throws SQLException;
+    String getProfileImageUrl(String email) throws SQLException;
 }

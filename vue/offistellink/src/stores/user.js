@@ -7,6 +7,7 @@ import {
   userConfirm,
   tokenRegeneration,
   logout,
+  imageUpdate,
 } from "@/api/user";
 import { httpStatusCode } from "@/util/http-status";
 import { jwtDecode } from "jwt-decode";
@@ -142,6 +143,26 @@ export const useUserStore = defineStore(
       );
     };
 
+    const profileImageUpdate = async (image) => {
+      await imageUpdate(
+        userInfo.value.email, // 사용자 이메일 전달
+        image, // 이미지 데이터 전달
+        (response) => {
+          console.log(response);
+          if (response.status === httpStatusCode.OK) {
+            userInfo.value.profileImageUrl = response.data.imageUrl; // 새로운 프로필 이미지 URL 설정
+            alert("프로필 이미지가 성공적으로 변경되었습니다."); // 성공 메시지 알림
+          } else {
+            console.error("프로필 이미지 업데이트 실패!!!"); // 실패 시 에러 로그
+            alert("프로필 이미지 변경에 실패하였습니다."); // 실패 메시지 알림
+          }
+        },
+        (error) => {
+          console.error(error); // 에러 로그
+        }
+      );
+    };
+
     return {
       isLogin,
       isLoginError,
@@ -151,6 +172,7 @@ export const useUserStore = defineStore(
       getUserInfo,
       tokenRegenerate,
       userLogout,
+      profileImageUpdate,
     };
   },
   {

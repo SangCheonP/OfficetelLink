@@ -27,6 +27,7 @@
         <result column="admin" property="admin"/>
         <result column="created_at" property="createdAt"/>
         <result column="refresh_token" property="refreshToken"/>
+        <result column="profile_image_url" property="profileImageUrl"/>
     </resultMap>
 
     <!--  모든 사용자를 조회한다. selectAll은 DAO인터페이스, EmployeeDao 클래스의 메소드 이름과 일치시킨다. -->
@@ -53,7 +54,7 @@
     </select>
 
     <select id="userInfo" parameterType="string" resultMap="user">
-        select name, email, phone, point, admin, created_at
+        select name, email, phone, point, admin, created_at, profile_image_url
         from users
         where email = #{email}
     </select>
@@ -75,4 +76,16 @@
         set refresh_token = #{refreshToken, jdbcType=VARCHAR}
         where email = #{email};
     </update>
+
+    <update id="updateProfileImageUrl" parameterType="map">
+        update users
+        set profile_image_url = #{url}
+        where email = #{email};
+    </update>
+
+    <select id="getProfileImageUrl" parameterType="string" resultType="string">
+        select profile_image_url
+        from users
+        where email = #{email};
+    </select>
 </mapper>

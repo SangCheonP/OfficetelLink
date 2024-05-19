@@ -5,12 +5,56 @@ import { useUserStore } from "@/stores/user";
 
 const userStore = useUserStore();
 const { userInfo } = storeToRefs(userStore);
-const { userLogout } = userStore;
+const { userLogout, profileImageUpdate } = userStore;
+
+const fileInput = ref(null);
+const croppedImageUrl = ref(null);
 
 // 로그아웃 함수
 const logout = () => {
   userLogout();
   alert("로그아웃 되었습니다.");
+};
+
+// 프로필 이미지 변경 함수
+const triggerFileInput = () => {
+  fileInput.value.click();
+};
+
+const changeProfileImage = async (event) => {
+  const file = event.target.files[0]; // 파일 선택
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      cropImage(e.target.result); // 이미지 자르기 함수 호출
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+const cropImage = (dataUrl) => {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  const img = new Image();
+  img.onload = () => {
+    const size = 250; // 원하는 크기
+    canvas.width = size;
+    canvas.height = size;
+    ctx.clearRect(0, 0, size, size);
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.drawImage(img, 0, 0, size, size);
+    croppedImageUrl.value = canvas.toDataURL(); // 자른 이미지 URL 설정
+
+    // 서버로 이미지 업로드
+    canvas.toBlob(async (blob) => {
+      const formData = new FormData();
+      formData.append("image", blob, "profile.png");
+      await profileImageUpdate(formData); // 이미지 업데이트 함수 호출
+    });
+  };
+  img.src = dataUrl;
 };
 
 // 탭 상태 관리
@@ -66,27 +110,49 @@ onMounted(() => {
   <section class="wrap-mypage">
     <!-- 사용자 정보 컴포넌트 -->
     <div class="user-info-section">
-      <div class="mypage-pic">
-        <img src="@/assets/images/no-image.png" alt="IMG" />
+      <div class="image-container">
+        <div class="mypage-pic" v-if="!userInfo.profileImageUrl">
+          <img src="@/assets/images/no-image.png" alt="IMG" />
+        </div>
+        <div class="mypage-pic" v-else>
+          <img
+            :src="`http://localhost:8080${
+              userInfo.profileImageUrl
+            }?t=${Date.now()}`"
+            alt="IMG"
+          />
+        </div>
       </div>
+      <img
+        src="@/assets/images/change-image.png"
+        alt="Change Image"
+        class="change-icon"
+        @click="triggerFileInput"
+      />
+      <input
+        type="file"
+        ref="fileInput"
+        style="display: none"
+        @change="changeProfileImage"
+      />
 
       <div class="mypage-info">
         <div class="user-info">
           <div class="user-info-field">
-            <label>이름:</label>
+            <label>이름 :</label>
             <span>{{ userInfo.name }}</span>
           </div>
           <div class="user-info-field">
-            <label>이메일:</label>
+            <label>이메일 :</label>
             <span>{{ userInfo.email }}</span>
           </div>
           <div class="user-info-field user-info-field-addition">
-            <label>등급:</label>
-            <span>Gold </span>
-            <label>게시글:</label>
+            <label>게시글 :</label>
             <span>15 </span>
-            <label>댓글:</label>
+            <label>댓글 :</label>
             <span>3 </span>
+            <label>포인트 :</label>
+            <span>{{ userInfo.point }} </span>
           </div>
         </div>
         <div class="container-mypage-form-btn">
@@ -167,6 +233,7 @@ onMounted(() => {
   background: #fff;
   border-radius: 10px;
   overflow: hidden;
+  margin-top: 60px;
   padding: 55px 55px 37px 55px;
   box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.1);
   display: flex;
@@ -181,17 +248,32 @@ onMounted(() => {
   margin-bottom: 20px;
 }
 
-.mypage-pic {
-  flex: 1;
+.image-container {
+  position: relative;
+  width: 250px; /* 고정된 너비 */
+  height: 250px; /* 고정된 높이 */
+  border-radius: 50%; /* 원 모양으로 설정 */
+  overflow: hidden; /* 원 밖의 이미지 부분을 숨김 */
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .mypage-pic img {
-  max-width: 230px;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  border: 2px solid #e6e6e6;
+  border: 5px solid rgb(0, 0, 0, 0.1);
+  object-fit: cover; /* 이미지가 컨테이너에 맞게 조정되도록 설정 */
+}
+
+.change-icon {
+  position: absolute;
+  margin-top: 130px;
+  margin-left: 210px;
+  width: 40px; /* 아이콘의 크기 조정 */
+  height: 40px; /* 아이콘의 크기 조정 */
+  cursor: pointer;
 }
 
 .mypage-info {
@@ -226,6 +308,10 @@ onMounted(() => {
   font-size: 20px;
   color: #333333;
   line-height: 1.5;
+}
+
+.user-info-field-addition {
+  padding-bottom: 10px;
 }
 
 .user-info-field-addition span {
