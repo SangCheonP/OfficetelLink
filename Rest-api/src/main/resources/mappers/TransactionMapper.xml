@@ -6,6 +6,7 @@
     <resultMap id="transactions" type="TransactionDto">
         <result column="id" property="id"/>
         <result column="sigungu" property="sigungu"/>
+        <result column="bungi" property="bungi"/>
         <result column="dangi_name" property="dangiName"/>
         <result column="area" property="area"/>
         <result column="contract_date" property="contractDate"/>
@@ -23,17 +24,23 @@
     </select>
 
     <!-- 구, 동, 도로명에 따른 조건 조회 -->
+    <!-- 결과 출력을 위한 단지 이름, 거래가, 위도, 경도 컬럼 필요 -->
     <resultMap id="search" type="TransactionSearchDto">
         <result column="gu" property="gu"/>
         <result column="dong" property="dong"/>
         <result column="road_name" property="roadName"/>
+        <result column="dangi_name" property="dangiName"/>
+        <result column="bungi" property="bungi"/>
+        <result column="deal" property="deal"/>
+        <result column="latitude" property="latitude"/>
+        <result column="longitude" property="longitude"/>
     </resultMap>
 
     <!-- 구, 동, 도로명에 따른 조건 조회 -->
     <select id="getTransactionByConditions" parameterType="TransactionSearchDto" resultMap="search">
         select SUBSTRING_INDEX(SUBSTRING_INDEX(sigungu, ' ', 2), ' ', -1) AS gu,
                SUBSTRING_INDEX(sigungu, ' ', -1) AS dong,
-               road_name
+               road_name, dangi_name, bungi,deal, latitude, longitude
         from transactions
         WHERE
             substring_index(substring_index(sigungu, ' ', 2), ' ', -1) = #{gu}

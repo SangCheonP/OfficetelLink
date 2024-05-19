@@ -26,7 +26,7 @@
           <div class="card">
             <div class="card-body">
               <h5 class="card-title text-brand">월별 시세 추이</h5>
-                <MapChart></MapChart>
+              <MapChart></MapChart>
               <!-- 차트 내용 -->
             </div>
           </div>
@@ -37,6 +37,9 @@
             <div class="card-body">
               <h5 class="card-title text-brand">Map</h5>
               <div ref="mapContainer" style="width: 100%; height: 400px;"></div>
+              <div v-for="marker in markersDataArray" :key="marker.roadName">
+                <p>{{ marker.gu }} {{ marker.dong }} {{ marker.roadName }}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -61,16 +64,13 @@ export default {
   setup() {
     const mapContainer = ref(null);
     const markersDataArray = ref([]);
-    const markersArray = ref([]);
     const selectedGu = ref('');
     const selectedDong = ref('');
     const selectedRoad = ref('');
+    let map = null;
+    let clusterer = null;
 
-    const hiddenInput = ref(null);
-    const focusInput = () => {
-      hiddenInput.value.focus();
-    };
-
+    // 클러스터 스타일 
     const clusterStyles = [
       {
         width: '53px',
@@ -111,18 +111,16 @@ export default {
       }
     });
 
-    // 맵 초기화
+    // 카카오 맵 초기화 & db 데이터 연동
     const initMap = () => {
       if (mapContainer.value) {
-        const markers = {
-          center: new window.kakao.maps.LatLng(36.3556018, 127.3445886),
+        const centerPosition = new window.kakao.maps.LatLng(36.3556018, 127.3445886);
+        map = new window.kakao.maps.Map(mapContainer.value, {
+          center: centerPosition,
           level: 3
-        };
+        });
 
-        const map = new window.kakao.maps.Map(mapContainer.value, markers);
-
-        // 클러스터 정의 
-        const clusterer = new window.kakao.maps.MarkerClusterer({
+        clusterer = new window.kakao.maps.MarkerClusterer({
           map: map,
           averageCenter: true,
           minLevel: 3,
@@ -131,98 +129,52 @@ export default {
           styles: clusterStyles
         });
 
-        // 마커 이미지 등록 
         const imageSize = new window.kakao.maps.Size(64, 69);
         const imageOption = { offset: new window.kakao.maps.Point(27, 69) };
         const markerImage = new window.kakao.maps.MarkerImage(markerImageSrc, imageSize, imageOption);
 
-        // 데이터 불러오기 
         axios.get("http://localhost:8080/transactions")
           .then(response => {
             markersDataArray.value = response.data;
-            const markers = markersDataArray.value.map(markerData => {     
-              const markerPosition = new window.kakao.maps.LatLng(markerData.latitude, markerData.longitude);
-              const marker = new window.kakao.maps.Marker({
-                position: markerPosition,
-                image: markerImage
-              });
-              marker.dangiName = markerData.dangiName;
-              marker.bungi = markerData.bungi;
-              marker.deal = markerData.deal;
-              // 클러스터 마커 표시 
-              window.kakao.maps.event.addListener(marker, 'mouseover', function() {
-                const content = 
-                  `<div style="padding:10px; background:rgba(255,255,255,0.9); color:#333; border-radius:10px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); font-size:14px; font-weight:bold;">
-                    평균 거래가: ${marker.deal.toLocaleString()}만원
-                  </div>`;
-                const position = marker.getPosition();
-                const customOverlay = new window.kakao.maps.CustomOverlay({
-                  position: position,
-                  content: content,
-                  xAnchor: 0.5,
-                  yAnchor: 2.2
-                });
-
-                if (window.currentOverlay) {
-                  window.currentOverlay.setMap(null);
-                }
-                customOverlay.setMap(map);
-                window.currentOverlay = customOverlay;
-              });
-
-              // 마우스가 마커에서 벗어날 시 거래가 숨기기
-              window.kakao.maps.event.addListener(marker, 'mouseout', function() {
-                if (window.currentOverlay) {
-                  window.currentOverlay.setMap(null);
-                  window.currentOverlay = null;
-                }
-              });
-
-              // 마커 클릭 시 단지 이름, 번지, 거래가 표시 및 토글 기능 추가
-              window.kakao.maps.event.addListener(marker, 'click', function() {
-                if (marker.customOverlay && marker.customOverlay.getMap()) {
-                  marker.customOverlay.setMap(null);
-                  marker.customOverlay = null;
-                } else {
-                  const content = 
-                    `<div style="padding:10px; background:rgba(255,255,255,0.9); color:#333; border-radius:10px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); font-size:14px; font-weight:bold;">
-                      단지 이름: ${marker.dangiName}<br>
-                      번지: ${marker.bungi}<br>
-                      거래가: ${marker.deal.toLocaleString()}만원
-                    </div>`;
-                  const position = marker.getPosition();
-                  marker.customOverlay = new window.kakao.maps.CustomOverlay({
-                    position: position,
-                    content: content,
-                    xAnchor: 0.5,
-                    yAnchor: 1.7
-                  });
-                  marker.customOverlay.setMap(map);
-                }
-              });
-
-              return marker;
-            });
-            clusterer.addMarkers(markers);
-            markersArray.value = markers;
+            updateMarkers(markersDataArray.value);
           });
+      }
+    };
 
-        // 평균 거래가 계산 
-        window.kakao.maps.event.addListener(clusterer, 'clusterover', function(cluster) {
-          const markers = cluster.getMarkers();
-          const totalDeal = markers.reduce((sum, marker) => sum + marker.deal, 0);
-          const averageDeal = Math.round(totalDeal / markers.length);
-          
+    // 검색 조건에 따른 마커 업데이트 & 지도 이동
+    const updateMarkers = (data) => {
+      if (clusterer) {
+        clusterer.clear();
+      }
+
+      const imageSize = new window.kakao.maps.Size(64, 69);
+      const imageOption = { offset: new window.kakao.maps.Point(27, 69) };
+      const markerImage = new window.kakao.maps.MarkerImage(markerImageSrc, imageSize, imageOption);
+
+      const bounds = new window.kakao.maps.LatLngBounds();
+
+      const markers = data.map(markerData => {
+        const markerPosition = new window.kakao.maps.LatLng(markerData.latitude, markerData.longitude);
+        bounds.extend(markerPosition);
+        const marker = new window.kakao.maps.Marker({
+          position: markerPosition,
+          image: markerImage
+        });
+        marker.dangiName = markerData.dangiName;
+        marker.bungi = markerData.bungi;
+        marker.deal = markerData.deal;
+
+        window.kakao.maps.event.addListener(marker, 'mouseover', function() {
           const content = 
             `<div style="padding:10px; background:rgba(255,255,255,0.9); color:#333; border-radius:10px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); font-size:14px; font-weight:bold;">
-                평균 거래가: ${averageDeal.toLocaleString()}만원
+              평균 거래가: ${marker.deal.toLocaleString()}만원
             </div>`;
-          const position = cluster.getCenter();
+          const position = marker.getPosition();
           const customOverlay = new window.kakao.maps.CustomOverlay({
             position: position,
             content: content,
             xAnchor: 0.5,
-            yAnchor: 1.2
+            yAnchor: 2.2
           });
 
           if (window.currentOverlay) {
@@ -232,14 +184,46 @@ export default {
           window.currentOverlay = customOverlay;
         });
 
-        // 클러스터 마우스 아웃 시 평균 거래가 숨기기
-        window.kakao.maps.event.addListener(clusterer, 'clusterout', function() {
+        window.kakao.maps.event.addListener(marker, 'mouseout', function() {
           if (window.currentOverlay) {
             window.currentOverlay.setMap(null);
             window.currentOverlay = null;
           }
-        });  
-      }
+        });
+
+        window.kakao.maps.event.addListener(marker, 'click', function() {
+          if (marker.customOverlay && marker.customOverlay.getMap()) {
+            marker.customOverlay.setMap(null);
+            marker.customOverlay = null;
+          } else {
+            const content = 
+              `<div style="padding:10px; background:rgba(255,255,255,0.9); color:#333; border-radius:10px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); font-size:14px; font-weight:bold;">
+                단지 이름: ${marker.dangiName}<br>
+                번지: ${marker.bungi}<br>
+                거래가: ${marker.deal.toLocaleString()}만원
+              </div>`;
+            const position = marker.getPosition();
+            marker.customOverlay = new window.kakao.maps.CustomOverlay({
+              position: position,
+              content: content,
+              xAnchor: 0.5,
+              yAnchor: 1.7
+            });
+            marker.customOverlay.setMap(map);
+          }
+        });
+
+        return marker;
+      });
+
+      clusterer.addMarkers(markers);
+      map.setBounds(bounds);
+
+      // 초기 줌 레벨을 다시 설정
+      const initialZoomLevel = 3;
+      const initialCenterPosition = new window.kakao.maps.LatLng(36.3556018, 127.3445886);
+      map.setLevel(initialZoomLevel);
+      map.setCenter(initialCenterPosition);
     };
 
     const loadKakaoMapsScript = () => {
@@ -249,17 +233,32 @@ export default {
       document.head.appendChild(script);
     };
 
-    // 검색 처리 로직
-    const handleSearch = () => {
-      console.log(`Selected Gu: ${selectedGu.value}`);
-      console.log(`Selected Dong: ${selectedDong.value}`);
-      console.log(`Selected Road: ${selectedRoad.value}`);
+    // 필터링 조건 
+    const handleSearch = (gu, dong, road) => {
+      if (!gu || !dong || !road) {
+        alert('모든 검색 조건을 입력하세요.'); // 경고 메시지 표시
+        return;
+      }
+
+      const searchDto = {
+        gu,
+        dong,
+        roadName: road
+      };
+
+      axios.post('http://localhost:8080/transactions/search', searchDto)
+        .then(response => {
+          markersDataArray.value = response.data;
+          if (markersDataArray.value.length === 0) {
+            alert('조건에 맞는 지역이 존재하지 않습니다!');
+            return;
+          }
+          updateMarkers(markersDataArray.value);
+        });
     };
 
     return {
       mapContainer,
-      hiddenInput,
-      focusInput,
       selectedGu,
       selectedDong,
       selectedRoad,
