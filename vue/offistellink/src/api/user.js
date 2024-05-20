@@ -33,4 +33,18 @@ async function imageUpdate(email, image, success, fail) {
     .catch(fail); // 성공 및 실패 콜백 설정
 }
 
-export { userConfirm, findByEmail, tokenRegeneration, logout, imageUpdate };
+async function checkPasswrod(password, success, fail) {
+  await local
+    .post(`/user/verify-password`, { email, password })
+    .then(success)
+    .catch(fail);
+}
+
+export {
+  userConfirm,
+  findByEmail,
+  tokenRegeneration,
+  logout,
+  imageUpdate,
+  checkPasswrod,
+};

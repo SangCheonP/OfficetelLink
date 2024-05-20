@@ -8,6 +8,7 @@ import {
   tokenRegeneration,
   logout,
   imageUpdate,
+  checkPasswrod,
 } from "@/api/user";
 import { httpStatusCode } from "@/util/http-status";
 import { jwtDecode } from "jwt-decode";
@@ -163,6 +164,26 @@ export const useUserStore = defineStore(
       );
     };
 
+    const checkCurrentPassword = async (email, password) => {
+      await checkPasswrod(
+        email,
+        password, // 입력받은 현재 비밀번호
+        (response) => {
+          console.log(response);
+          if (response.status === httpStatusCode.OK) {
+            console.log("입력한 비밀번호와 일치");
+            return true;
+          } else {
+            console.log("입력한 비밀번호와 불일치");
+            return false;
+          }
+        },
+        (error) => {
+          console.error(error);
+        }
+      );
+    };
+
     return {
       isLogin,
       isLoginError,
@@ -173,6 +194,7 @@ export const useUserStore = defineStore(
       tokenRegenerate,
       userLogout,
       profileImageUpdate,
+      checkCurrentPassword,
     };
   },
   {

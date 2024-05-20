@@ -1,14 +1,24 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { storeToRefs } from "pinia";
 import { useUserStore } from "@/stores/user";
 
 const userStore = useUserStore();
 const { userInfo } = storeToRefs(userStore);
-const { profileImageUpdate } = userStore;
+const {
+  profileImageUpdate,
+  updatePassword,
+  updatePhoneNumber,
+  checkCurrentPassword,
+} = userStore;
 
 const fileInput = ref(null);
 const croppedImageUrl = ref(null);
+const currentPassword = ref("");
+const newPassword = ref("");
+const confirmPassword = ref("");
+const phoneInput = ref(userInfo.value.phone); // 전화번호 입력값을 ref로 관리
+const errorMessage = ref("");
 
 // 프로필 이미지 변경 함수
 const triggerFileInput = () => {
@@ -50,6 +60,93 @@ const cropImage = (dataUrl) => {
   };
   img.src = dataUrl;
 };
+
+// 전화번호 형식 변경 함수
+const changePhoneFormat = (event) => {
+  let input = event.target.value.replace(/[^\d-]/g, ""); // 숫자와 하이픈 이외의 문자 제거
+  let formatted = "";
+
+  if (input.length > 3) {
+    formatted = input.slice(0, 3) + "-";
+    if (input.length > 7) {
+      formatted += input.slice(3, 7) + "-" + input.slice(7);
+    } else {
+      formatted += input.slice(3);
+    }
+  } else {
+    formatted = input;
+  }
+
+  phoneInput.value = formatted;
+};
+
+// 비밀번호 일치 여부 확인
+const passwordMismatch = computed(() => {
+  return (
+    newPassword.value &&
+    confirmPassword.value &&
+    newPassword.value !== confirmPassword.value
+  );
+});
+
+const passwordMatch = computed(() => {
+  return (
+    newPassword.value &&
+    confirmPassword.value &&
+    newPassword.value === confirmPassword.value
+  );
+});
+
+// 전화번호 형식 확인
+const validPhoneNumber = computed(() => {
+  const phonePattern = /^01[016789]-\d{3,4}-\d{4}$/;
+  const input = phoneInput.value;
+
+  // 입력값이 비어있으면 false 반환
+  if (!input) return false;
+
+  // 전화번호에 숫자와 하이픈 외의 다른 문자가 있는지 확인
+  const containsOnlyValidChars = /^[\d-]+$/.test(input);
+  const isValid = phonePattern.test(input) && containsOnlyValidChars;
+
+  console.log(
+    `isValid: ${isValid}, containsOnlyValidChars: ${containsOnlyValidChars}`
+  );
+  return isValid;
+});
+
+// 사용자 정보 업데이트 함수
+const updateUserInfo = async () => {
+  console.log(userInfo.value.email, currentPassword.value);
+  if (
+    !(await checkCurrentPassword(userInfo.value.email, currentPassword.value))
+  ) {
+    errorMessage.value = "현재 비밀번호가 올바르지 않습니다.";
+    return;
+  }
+
+  if (passwordMismatch.value) {
+    errorMessage.value = "새 비밀번호가 일치하지 않습니다.";
+    return;
+  }
+
+  if (!validPhoneNumber.value) {
+    errorMessage.value = "전화번호 형식이 올바르지 않습니다.";
+    return;
+  }
+
+  try {
+    // 서버에 새 비밀번호와 전화번호 업데이트
+    await updatePassword({
+      currentPassword: currentPassword.value,
+      newPassword: newPassword.value,
+    });
+    await updatePhoneNumber({ phone: phoneInput.value });
+    errorMessage.value = "정보가 성공적으로 변경되었습니다.";
+  } catch (error) {
+    errorMessage.value = "정보 변경에 실패했습니다.";
+  }
+};
 </script>
 
 <template>
@@ -62,15 +159,24 @@ const cropImage = (dataUrl) => {
         </div>
         <div class="mypage-pic" v-else>
           <img
-            :src="`http://localhost:8080${userInfo.profileImageUrl}?t=${Date.now()}`"
+            :src="`http://localhost:8080${
+              userInfo.profileImageUrl
+            }?t=${Date.now()}`"
             alt="IMG"
           />
         </div>
       </div>
-      <input type="file" ref="fileInput" style="display: none" @change="changeProfileImage" />
+      <input
+        type="file"
+        ref="fileInput"
+        style="display: none"
+        @change="changeProfileImage"
+      />
 
       <div class="container-mypage-form-btn">
-        <button class="mypage-form-btn" @click="triggerFileInput">이미지 변경</button>
+        <button class="mypage-form-btn" @click="triggerFileInput">
+          이미지 변경
+        </button>
         <button class="mypage-form-btn">테두리 변경</button>
       </div>
 
@@ -78,6 +184,8 @@ const cropImage = (dataUrl) => {
       <hr class="separator-line" />
 
       <div class="user-info">
+        <h3 class="user-info-title">정보 수정</h3>
+
         <div class="input-group">
           <label for="email">이메일 :</label>
           <span name="email" id="email">{{ userInfo.email }}</span>
@@ -90,30 +198,65 @@ const cropImage = (dataUrl) => {
 
         <div class="input-group">
           <label for="cur-password">현재 비밀번호 :</label>
-          <input type="password" name="cur-password" id="cur-password" />
+          <input
+            type="password"
+            name="cur-password"
+            id="cur-password"
+            v-model="currentPassword"
+          />
         </div>
 
         <div class="input-group">
           <label for="new-password">새 비밀번호 :</label>
-          <input type="password" name="new-password" id="new-password" />
+          <input
+            type="password"
+            name="new-password"
+            id="new-password"
+            v-model="newPassword"
+          />
         </div>
 
         <div class="input-group">
           <label for="confirm-password">새 비밀번호 재입력 :</label>
-          <input type="password" name="confirm-password" id="confirm-password" />
+          <input
+            type="password"
+            name="confirm-password"
+            id="confirm-password"
+            v-model="confirmPassword"
+          />
+        </div>
+        <div v-if="passwordMismatch" class="error-message">
+          비밀번호가 일치하지 않습니다.
+        </div>
+        <div v-if="passwordMatch" class="success-message">
+          비밀번호가 일치합니다.
         </div>
 
         <div class="input-group">
           <label for="phone">전화번호 :</label>
-          <input type="text" name="phone" id="phone" :value="userInfo.phone" />
+          <input
+            type="text"
+            name="phone"
+            id="phone"
+            placeholder="010-1234-5678"
+            :value="phoneInput"
+            @input="changePhoneFormat"
+          />
+        </div>
+        <div v-if="!validPhoneNumber && phoneInput" class="error-message">
+          전화번호 형식이 올바르지 않습니다.
         </div>
       </div>
 
+      <div v-if="errorMessage" class="error-message-final">
+        {{ errorMessage }}
+      </div>
+
       <div class="container-mypage-form-btn">
-        <router-link :to="{ name: 'user-mypage' }" class="mypage-form-btn">취소</router-link>
-        <router-link :to="{ name: 'user-mypage' }" @click.prevent="" class="mypage-form-btn"
-          >변경</router-link
+        <router-link :to="{ name: 'user-mypage' }" class="mypage-form-btn"
+          >취소</router-link
         >
+        <button class="mypage-form-btn" @click="updateUserInfo">변경</button>
       </div>
     </div>
   </section>
@@ -205,6 +348,10 @@ const cropImage = (dataUrl) => {
   align-items: center;
 }
 
+.user-info-title {
+  padding-bottom: 30px;
+}
+
 .input-group {
   width: 100%;
   display: flex;
@@ -222,7 +369,44 @@ const cropImage = (dataUrl) => {
 .input-group input {
   width: 65%;
   padding: 10px;
+}
+
+.input-group span {
+  border: none;
+  background: none;
+}
+
+.input-group input {
   border: 1px solid #ccc;
   border-radius: 5px;
+}
+
+/* 이메일과 이름 필드에 대한 테두리 제거 */
+.input-group span[name="email"],
+.input-group span[name="name"] {
+  border: none;
+  background: none;
+}
+
+/* 경고 및 성공 메시지 스타일 */
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
+
+.success-message {
+  color: green;
+  font-size: 14px;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
+
+.error-message-final {
+  color: red;
+  font-size: 17px;
+  margin-top: 15px;
+  margin-bottom: 20px;
 }
 </style>
