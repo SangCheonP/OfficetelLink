@@ -10,9 +10,11 @@ public interface NoticeService {
 
     List<NoticeDto> getAllNotices() throws SQLException; //공지사항 조회
 
-    void insertNotice(NoticeDto noticeDto) throws SQLException; //공지사항 등록
+    void insertNotice(String title, String content, String email) throws SQLException; //공지사항 등록
 
     void updateNotice(NoticeDto noticeDto) throws SQLException; //공지사항 수정
 
     void deleteNotice(int id) throws SQLException; //공지사항 삭제
+
+    void incrementView(int id) throws SQLException; //조회수 증가
 }

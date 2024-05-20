@@ -16,5 +16,5 @@ public class NoticeDto {
     private LocalDateTime updatedAt; //갱신일자
 
     private String userEmail;
-    private List<FileDto> files; //업로드할 파일
+//    private List<FileDto> files; //업로드할 파일
 }

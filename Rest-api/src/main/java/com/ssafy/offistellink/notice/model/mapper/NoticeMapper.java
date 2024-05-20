@@ -16,4 +16,6 @@ public interface NoticeMapper {
     void updateNotice(NoticeDto noticeDto); //공지사항 수정
 
     void deleteNotice(int id); //공지사항 삭제
+
+    void incrementView(int id); //조회수 증가
 }

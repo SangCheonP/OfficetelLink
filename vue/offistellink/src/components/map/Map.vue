@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="board-wrapper">
     <header class="navbar navbar-expand navbar-dark bg-dark">
       <br><br><br><br>
     </header>
@@ -283,6 +283,18 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
+.board-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #9053c7;
+    background: -webkit-linear-gradient(-135deg, #c850c0, #4158d0);
+    background: -o-linear-gradient(-135deg, #c850c0, #4158d0);
+    background: -moz-linear-gradient(-135deg, #c850c0, #4158d0);
+    background: linear-gradient(-135deg, #c850c0, #4158d0);
+}
+
 table {
   width: 100%;
   border-collapse: collapse;

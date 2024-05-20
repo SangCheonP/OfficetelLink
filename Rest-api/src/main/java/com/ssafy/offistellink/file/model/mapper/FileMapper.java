@@ -9,5 +9,4 @@ public interface FileMapper {
     FileDto getFileById(int id);
     void insertFile(FileDto file);
     void deleteFilesByNoticeId(int noticeId);
-    void saveFile(MultipartFile file, FileDto fileDto);
 }

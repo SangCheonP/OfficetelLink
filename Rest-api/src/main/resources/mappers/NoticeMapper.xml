@@ -10,61 +10,24 @@
         <result column="views" property="views"/>
         <result column="created_at" property="createdAt"/>
         <result column="updated_at" property="updatedAt"/>
-
-        <collection property="files" ofType="com.ssafy.offistellink.file.model.dto.FileDto">
-            <id column="file_id" property="id"/>
-            <result column="file_origin_name" property="originName"/>
-            <result column="file_saved_name" property="savedName"/>
-            <result column="file_path" property="path"/>
-            <result column="file_type" property="type"/>
-            <result column="file_notice_id" property="noticeId"/>
-        </collection>
     </resultMap>
 
     <!-- 개별 공지사항 조회 -->
     <select id="getNoticeById" resultMap="notices">
-        SELECT
-            n.id,
-            n.user_email,
-            n.title,
-            n.content,
-            n.views,
-            n.created_at,
-            n.updated_at,
-            f.id AS file_id,
-            f.origin_name AS file_origin_name,
-            f.saved_name AS file_saved_name,
-            f.path AS file_path,
-            f.type AS file_type,
-            f.notice_id AS file_notice_id
-        FROM notices n
-                 LEFT JOIN files f ON n.id = f.notice_id
-        WHERE n.id = #{id}
+        Select *
+        from notices
+        where id = #{id}
     </select>
 
     <!-- 공지사항 조회 -->
     <select id="getAllNotices" resultMap="notices">
-        SELECT
-            n.id,
-            n.user_email,
-            n.title,
-            n.content,
-            n.views,
-            n.created_at,
-            n.updated_at,
-            f.id AS file_id,
-            f.origin_name AS file_origin_name,
-            f.saved_name AS file_saved_name,
-            f.path AS file_path,
-            f.type AS file_type,
-            f.notice_id AS file_notice_id
-        FROM notices n
-        LEFT JOIN files f ON n.id = f.notice_id
+        SELECT *
+        FROM notices;
     </select>
 
     <insert id="insertNotice" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO notices (user_email,title,content,views,created_at,updated_at)
-        VALUES (#{userEmail}, #{title}, #{content}, #{views}, now(), now())
+        INSERT INTO notices (title, content, views, created_at, updated_at, user_email)
+        VALUES (#{title}, #{content}, 0, now(), now(), #{userEmail})
     </insert>
 
     <update id="updateNotice">
@@ -72,9 +35,7 @@
         <set>
             <if test="title != null">title = #{title},</if>
             <if test="content != null">content = #{content},</if>
-            <if test="views != null">views = #{views},</if>
             <if test="updatedAt != null">updated_at = #{updatedAt},</if>
-            <if test="userEmail != null">user_email = #{userEmail}</if>
         </set>
         WHERE id = #{id}
     </update>
@@ -82,4 +43,12 @@
     <delete id="deleteNotice">
         DELETE FROM notices WHERE id = #{id}
     </delete>
+
+    <!-- 조회수 증가 -->
+    <update id="incrementView" parameterType="int">
+        UPDATE notices
+        SET views = views + 1
+        WHERE id = #{id}
+    </update>
+
 </mapper>

@@ -21,8 +21,8 @@
     </select>
 
     <insert id="insertFile" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO files (origin_name, saved_name, path,type, notice_id)
-        VALUES (#{originName}, #{savedName}, #{path}, #{type}, #{noticeId})
+        INSERT INTO files (notice_id, origin_name, path)
+        VALUES (#{noticeId}, #{originName}, #{path})
     </insert>
 
     <delete id="deleteFilesByNoticeId">

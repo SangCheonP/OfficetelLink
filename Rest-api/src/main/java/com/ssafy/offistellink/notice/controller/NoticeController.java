@@ -4,8 +4,10 @@ import com.ssafy.offistellink.notice.model.dto.NoticeDto;
 import com.ssafy.offistellink.notice.model.service.NoticeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -24,8 +26,11 @@ public class NoticeController {
     }
 
     @PostMapping
-    public void createNotice(@RequestBody NoticeDto notice) throws SQLException {
-        noticeService.insertNotice(notice);
+    public ResponseEntity<String> createNotice(@RequestBody NoticeDto noticeDto) throws SQLException {
+
+//        String userEmail = principal.getName();
+        noticeService.insertNotice(noticeDto.getTitle(), noticeDto.getTitle(), null);
+        return ResponseEntity.status(201).body("공지사항이 등록되었습니다");
     }
 
     @GetMapping("/{id}")
