@@ -5,56 +5,12 @@ import { useUserStore } from "@/stores/user";
 
 const userStore = useUserStore();
 const { userInfo } = storeToRefs(userStore);
-const { userLogout, profileImageUpdate } = userStore;
-
-const fileInput = ref(null);
-const croppedImageUrl = ref(null);
+const { userLogout } = userStore;
 
 // 로그아웃 함수
 const logout = () => {
   userLogout();
   alert("로그아웃 되었습니다.");
-};
-
-// 프로필 이미지 변경 함수
-const triggerFileInput = () => {
-  fileInput.value.click();
-};
-
-const changeProfileImage = async (event) => {
-  const file = event.target.files[0]; // 파일 선택
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      cropImage(e.target.result); // 이미지 자르기 함수 호출
-    };
-    reader.readAsDataURL(file);
-  }
-};
-
-const cropImage = (dataUrl) => {
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
-  const img = new Image();
-  img.onload = () => {
-    const size = 250; // 원하는 크기
-    canvas.width = size;
-    canvas.height = size;
-    ctx.clearRect(0, 0, size, size);
-    ctx.beginPath();
-    ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
-    ctx.clip();
-    ctx.drawImage(img, 0, 0, size, size);
-    croppedImageUrl.value = canvas.toDataURL(); // 자른 이미지 URL 설정
-
-    // 서버로 이미지 업로드
-    canvas.toBlob(async (blob) => {
-      const formData = new FormData();
-      formData.append("image", blob, "profile.png");
-      await profileImageUpdate(formData); // 이미지 업데이트 함수 호출
-    });
-  };
-  img.src = dataUrl;
 };
 
 // 탭 상태 관리
@@ -100,7 +56,6 @@ const savedPosts = ref([
   "저장한 게시글 10",
 ]);
 
-// 마운트 시 최근 게시글을 먼저 보여줌
 onMounted(() => {
   console.log(userInfo.value);
 });
@@ -116,26 +71,11 @@ onMounted(() => {
         </div>
         <div class="mypage-pic" v-else>
           <img
-            :src="`http://localhost:8080${
-              userInfo.profileImageUrl
-            }?t=${Date.now()}`"
+            :src="`http://localhost:8080${userInfo.profileImageUrl}?t=${Date.now()}`"
             alt="IMG"
           />
         </div>
       </div>
-      <img
-        src="@/assets/images/change-image.png"
-        alt="Change Image"
-        class="change-icon"
-        @click="triggerFileInput"
-      />
-      <input
-        type="file"
-        ref="fileInput"
-        style="display: none"
-        @change="changeProfileImage"
-      />
-
       <div class="mypage-info">
         <div class="user-info">
           <div class="user-info-field">
@@ -156,8 +96,10 @@ onMounted(() => {
           </div>
         </div>
         <div class="container-mypage-form-btn">
-          <button class="mypage-form-btn">정보 수정</button>
-          <button class="mypage-form-btn" @click="logout">로그아웃</button>
+          <router-link :to="{ name: 'user-modify' }" class="mypage-form-btn">정보 수정</router-link>
+          <router-link :to="{ name: 'home' }" class="mypage-form-btn" @click="logout"
+            >로그아웃</router-link
+          >
         </div>
       </div>
     </div>
@@ -170,7 +112,6 @@ onMounted(() => {
       </div>
       <div class="progress-bar-container">
         <div class="progress-bar" style="width: 60%"></div>
-        <!-- 경험치 비율에 따라 width 값을 조정 -->
       </div>
     </div>
 
@@ -219,9 +160,7 @@ onMounted(() => {
     </div>
 
     <div class="text-center p-t-12">
-      <router-link class="txt2" :to="{ name: 'home' }"
-        >홈으로 돌아가기</router-link
-      >
+      <router-link class="txt2" :to="{ name: 'home' }">홈으로 돌아가기</router-link>
     </div>
   </section>
 </template>
@@ -250,10 +189,10 @@ onMounted(() => {
 
 .image-container {
   position: relative;
-  width: 250px; /* 고정된 너비 */
-  height: 250px; /* 고정된 높이 */
-  border-radius: 50%; /* 원 모양으로 설정 */
-  overflow: hidden; /* 원 밖의 이미지 부분을 숨김 */
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -264,16 +203,7 @@ onMounted(() => {
   height: 100%;
   border-radius: 50%;
   border: 5px solid rgb(0, 0, 0, 0.1);
-  object-fit: cover; /* 이미지가 컨테이너에 맞게 조정되도록 설정 */
-}
-
-.change-icon {
-  position: absolute;
-  margin-top: 130px;
-  margin-left: 210px;
-  width: 40px; /* 아이콘의 크기 조정 */
-  height: 40px; /* 아이콘의 크기 조정 */
-  cursor: pointer;
+  object-fit: cover;
 }
 
 .mypage-info {
@@ -286,8 +216,8 @@ onMounted(() => {
 }
 
 .user-info {
-  text-align: center; /* 왼쪽 정렬 */
-  width: 100%; /* 전체 너비 */
+  text-align: center;
+  width: 100%;
 }
 
 .user-info-field {
