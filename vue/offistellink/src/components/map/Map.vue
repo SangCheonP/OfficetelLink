@@ -37,7 +37,7 @@
             <div class="card-body">
               <h5 class="card-title text-brand">Map</h5>
               <div ref="mapContainer" style="width: 100%; height: 400px;"></div>
-              <div v-for="marker in markersDataArray" :key="marker.roadName">
+              <div v-for="marker in markersDataArray.value" :key="marker.roadName">
                 <p>{{ marker.gu }} {{ marker.dong }} {{ marker.roadName }}</p>
               </div>
             </div>
@@ -54,21 +54,23 @@ import { ref, onMounted } from 'vue';
 import markerImageSrc from '@/assets/images/house-icon.png';
 import MapSelectBar from '@/components/map/MapSelectBar.vue';
 import MapChart from '@/components/map/MapChart.vue';
+import { POSITION, useToast } from 'vue-toastification';
 
 export default {
   name: 'KakaoMap',
   components: {
     MapSelectBar,
-    MapChart
+    MapChart,
   },
   setup() {
     const mapContainer = ref(null);
-    const markersDataArray = ref([]);
+    const markersDataArray = ref([]); // 초기화를 빈 배열로 설정
     const selectedGu = ref('');
     const selectedDong = ref('');
     const selectedRoad = ref('');
     let map = null;
     let clusterer = null;
+    const alert = useToast();
 
     // 클러스터 스타일 
     const clusterStyles = [
@@ -146,7 +148,7 @@ export default {
       if (clusterer) {
         clusterer.clear();
       }
-
+      console.log(markersDataArray.value)
       const imageSize = new window.kakao.maps.Size(64, 69);
       const imageOption = { offset: new window.kakao.maps.Point(27, 69) };
       const markerImage = new window.kakao.maps.MarkerImage(markerImageSrc, imageSize, imageOption);
@@ -219,11 +221,12 @@ export default {
       clusterer.addMarkers(markers);
       map.setBounds(bounds);
 
-      // 초기 줌 레벨을 다시 설정
-      const initialZoomLevel = 3;
-      const initialCenterPosition = new window.kakao.maps.LatLng(36.3556018, 127.3445886);
-      map.setLevel(initialZoomLevel);
-      map.setCenter(initialCenterPosition);
+      // 초기 줌 레벨을 지정
+      if (data.length === 562) {
+        const firstMarkerPosition = new window.kakao.maps.LatLng(data[192].latitude, data[192].longitude);
+        map.setCenter(firstMarkerPosition);
+        map.setLevel(3); // 적절한 줌 레벨로 설정
+      }
     };
 
     const loadKakaoMapsScript = () => {
@@ -236,7 +239,8 @@ export default {
     // 필터링 조건 
     const handleSearch = (gu, dong, road) => {
       if (!gu || !dong || !road) {
-        alert('모든 검색 조건을 입력하세요.'); // 경고 메시지 표시
+        alert.error('모든 검색 조건을 입력하세요.',
+        { position: POSITION.TOP_CENTER }); // 경고 메시지 표시
         return;
       }
 
@@ -250,7 +254,8 @@ export default {
         .then(response => {
           markersDataArray.value = response.data;
           if (markersDataArray.value.length === 0) {
-            alert('조건에 맞는 지역이 존재하지 않습니다!');
+            alert.warning('조건에 맞는 지역이 존재하지 않습니다!',
+            { position: POSITION.TOP_CENTER});
             return;
           }
           updateMarkers(markersDataArray.value);
@@ -259,6 +264,7 @@ export default {
 
     return {
       mapContainer,
+      markersDataArray,
       selectedGu,
       selectedDong,
       selectedRoad,
