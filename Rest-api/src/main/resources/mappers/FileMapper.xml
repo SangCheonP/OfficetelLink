@@ -1,0 +1,31 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.offistellink.file.model.mapper.FileMapper">
+
+    <resultMap id="files" type="FileDto">
+        <id property="id" column="id"/>
+        <result property="originName" column="origin_name"/>
+        <result property="savedName" column="saved_name"/>
+        <result property="path" column="path"/>
+        <result property="type" column="type"/>
+        <result property="noticeId" column="notice_id"/>
+    </resultMap>
+
+    <!-- 파일 조회 -->
+    <select id="getFileById" resultMap="files">
+        SELECT * FROM files WHERE id = #{id}
+    </select>
+
+    <select id="getFilesByNoticeId" resultMap="files">
+        SELECT * FROM files WHERE notice_id = #{noticeId}
+    </select>
+
+    <insert id="insertFile" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO files (origin_name, saved_name, path,type, notice_id)
+        VALUES (#{originName}, #{savedName}, #{path}, #{type}, #{noticeId})
+    </insert>
+
+    <delete id="deleteFilesByNoticeId">
+        DELETE FROM files WHERE notice_id = #{noticeId}
+    </delete>
+</mapper>
