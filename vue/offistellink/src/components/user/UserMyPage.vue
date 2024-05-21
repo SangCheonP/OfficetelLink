@@ -92,7 +92,7 @@ onMounted(() => {
             <label>댓글 :</label>
             <span>3 </span>
             <label>포인트 :</label>
-            <span>{{ userInfo.point }} </span>
+            <router-link :to="{name: 'shop'}">{{ userInfo.point }}</router-link>
           </div>
         </div>
         <div class="container-mypage-form-btn">
@@ -233,11 +233,16 @@ onMounted(() => {
   padding-right: 13px;
 }
 
-.user-info-field span {
+.user-info-field span, a {
   font-family: "Poppins", sans-serif;
   font-size: 20px;
   color: #333333;
   line-height: 1.5;
+}
+
+.user-info-field-addition a{
+  color: cornflowerblue;
+  text-decoration: underline;
 }
 
 .user-info-field-addition {

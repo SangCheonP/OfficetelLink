@@ -245,4 +245,37 @@ public class UserController {
         return new ResponseEntity<>(resultMap, status); // 응답 반환
     }
 
+    // 비밀번호 체크 엔드포인트 정의
+    @Operation(summary = "비밀번호 체크", description = "입력받은 비밀번호와 같은지 체크")
+    @PostMapping("/verify-password")
+    public ResponseEntity<String> checkPassword(
+            @RequestBody Map<String, String> info) throws Exception { // 비밀번호 파라미터
+
+        String email = info.get("email");
+        String password = info.get("password");
+
+        // userService를 사용하여 비밀번호 확인
+        boolean isPasswordValid = userService.checkPassword(email, password);
+
+        // 상태 코드와 메시지 설정
+        HttpStatus status = isPasswordValid ? HttpStatus.OK : HttpStatus.NOT_FOUND;
+        String message = isPasswordValid ? "비밀번호가 일치합니다." : "비밀번호가 일치하지 않습니다.";
+
+        // 상태 코드와 메시지를 포함한 응답 반환
+        return new ResponseEntity<>(message, status);
+    }
+
+
+    @Operation(summary = "마이페이지 정보 변경", description = "입력받은 정보로 변경함")
+    @PostMapping("/update-profile")
+    public ResponseEntity<String> updateProfile(@RequestBody Map<String, String> userInfo) throws Exception {
+
+        boolean isUpdated = userService.updateProfile(userInfo);
+
+        HttpStatus status = isUpdated ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
+        String message = isUpdated ? "정보를 변경하였습니다." : "정보 변경에 실패하였습니다.";
+
+        return new ResponseEntity<>(message, status);
+    }
+
 }

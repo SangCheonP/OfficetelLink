@@ -8,7 +8,8 @@ import {
   tokenRegeneration,
   logout,
   imageUpdate,
-  checkPasswrod,
+  checkPassword,
+  updateProfile
 } from "@/api/user";
 import { httpStatusCode } from "@/util/http-status";
 import { jwtDecode } from "jwt-decode";
@@ -131,7 +132,8 @@ export const useUserStore = defineStore(
             isLogin.value = false;
             userInfo.value = null;
             isValidToken.value = false;
-
+            
+            localStorage.removeItem("userStore")
             sessionStorage.removeItem("accessToken");
             sessionStorage.removeItem("refreshToken");
           } else {
@@ -165,24 +167,42 @@ export const useUserStore = defineStore(
     };
 
     const checkCurrentPassword = async (email, password) => {
-      await checkPasswrod(
+      let isValid = false;
+      await checkPassword(
         email,
         password, // 입력받은 현재 비밀번호
         (response) => {
           console.log(response);
           if (response.status === httpStatusCode.OK) {
             console.log("입력한 비밀번호와 일치");
-            return true;
+            isValid = true;
           } else {
             console.log("입력한 비밀번호와 불일치");
-            return false;
           }
         },
         (error) => {
           console.error(error);
         }
       );
+      return isValid;
     };
+
+    const updateUserProfile = async (email, password, phone) => {
+      await updateProfile(email, password, phone,
+        (response) =>{
+          console.log(response);
+          if (response.status === httpStatusCode.OK) {
+            console.log("정보를 변경했습니다.");
+            isValid = true;
+          } else {
+            console.log("정보 변경에 실패했습니다.");
+          }
+        },
+        (error) =>{
+            console.error(error)
+        }
+      )
+    }
 
     return {
       isLogin,
@@ -195,6 +215,7 @@ export const useUserStore = defineStore(
       userLogout,
       profileImageUpdate,
       checkCurrentPassword,
+      updateUserProfile
     };
   },
   {

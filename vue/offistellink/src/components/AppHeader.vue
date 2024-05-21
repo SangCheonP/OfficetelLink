@@ -64,7 +64,16 @@ const logout = () => {
                 >게시판</router-link
               >
             </li>
-            <li class="nav-item dropdown">
+            <!-- 상점 페이지-->
+            <li class="nav-item">
+              <router-link
+                class="nav-link"
+                :to="{ name: 'shop' }"
+                exact-active-class="active"
+                >상점</router-link
+              >
+            </li>
+            <!-- <li class="nav-item dropdown">
               <a
                 class="nav-link dropdown-toggle"
                 href="#"
@@ -89,7 +98,7 @@ const logout = () => {
                   >Agent Single</router-link
                 >
               </div>
-            </li>
+            </li> -->
           </ul>
         </div>
 
@@ -101,11 +110,21 @@ const logout = () => {
             aria-haspopup="true"
             aria-expanded="false"
           >
+            <!-- userInfo.profileImageUrl이 null이거나 비어 있는지 확인 -->
             <img
+              v-if="userInfo && userInfo.profileImageUrl"
               :src="`http://localhost:8080${
                 userInfo.profileImageUrl
               }?t=${Date.now()}`"
               alt="login"
+              id="loginImg"
+              class="login-img"
+            />
+            <!-- 기본 이미지를 보여줌 -->
+            <img
+              v-else
+              src="/src/assets/images/no-image.png"
+              alt="no image"
               id="loginImg"
               class="login-img"
             />

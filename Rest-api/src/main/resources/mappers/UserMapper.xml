@@ -88,4 +88,17 @@
         from users
         where email = #{email};
     </select>
+
+    <select id="checkPassword" parameterType="map" resultType="string">
+        select email
+        from users
+        where email = #{email} and password = #{password};
+    </select>
+
+    <update id="updateProfile" parameterType="map">
+        UPDATE users
+        SET password = #{password}, phone = #{phone}
+        WHERE email = #{email};
+    </update>
+
 </mapper>

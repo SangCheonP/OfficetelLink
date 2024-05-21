@@ -78,4 +78,24 @@ public class UserServiceImpl implements UserService {
     public String getProfileImageUrl(String email) throws Exception {
         return userMapper.getProfileImageUrl(email);
     }
+
+    @Override
+    public boolean checkPassword(String email, String password) throws Exception {
+        // 이메일과 비밀번호를 맵에 저장
+        Map<String, String> credentials = new HashMap<>();
+        credentials.put("email", email);
+        credentials.put("password", password);
+
+        // userMapper를 사용하여 비밀번호 확인
+        // 비밀번호가 맞으면 true, 아니면 false 반환
+        return userMapper.checkPassword(credentials) != null;
+    }
+
+    @Override
+    public boolean updateProfile(Map<String, String> userInfo) throws Exception {
+        // userMapper를 사용하여 데이터베이스에 프로필 업데이트
+        int updateCount = userMapper.updateProfile(userInfo);
+        return updateCount > 0;
+    }
+
 }

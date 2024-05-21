@@ -56,7 +56,7 @@ const handleSubmit = () => {
       })
       .then((response) => {
         alert("가입에 성공했습니다.");
-        router.push("/login");
+        router.push("/user/login");
       })
       .catch((error) => {
         console.error("가입 중 오류 발생:", error);

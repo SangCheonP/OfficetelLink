@@ -37,6 +37,10 @@ const router = createRouter({
       component: MapView,
     },
     {
+      path: '/shop',
+      name: 'shop'
+    },
+    {
       path: '/user',
       name: 'user',
       component: () => import('@/views/TheUserView.vue'),

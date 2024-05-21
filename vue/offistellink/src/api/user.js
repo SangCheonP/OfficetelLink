@@ -33,11 +33,22 @@ async function imageUpdate(email, image, success, fail) {
     .catch(fail); // 성공 및 실패 콜백 설정
 }
 
-async function checkPasswrod(password, success, fail) {
+async function checkPassword(email, password, success, fail) {
   await local
-    .post(`/user/verify-password`, { email, password })
+    .post(`/user/verify-password`, { email, password }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
     .then(success)
     .catch(fail);
+}
+
+async function updateProfile(email, password, phone, success, fail){
+  await local
+  .post(`/user/update-profile`, {email, password, phone})
+  .then(success)
+  .catch(fail)
 }
 
 export {
@@ -46,5 +57,6 @@ export {
   tokenRegeneration,
   logout,
   imageUpdate,
-  checkPasswrod,
+  checkPassword,
+  updateProfile
 };

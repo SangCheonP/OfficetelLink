@@ -4,6 +4,7 @@ import com.ssafy.offistellink.user.model.dto.UserDto;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 public interface UserService {
     List<UserDto> getAllUser() throws Exception;
@@ -16,4 +17,6 @@ public interface UserService {
     void deleteRefreshToken(String email) throws Exception;
     void updateProfileImageUrl(String email, String imageUrl) throws Exception;
     String getProfileImageUrl(String email) throws Exception;
+    boolean checkPassword(String email, String password) throws Exception;
+    boolean updateProfile(Map<String, String> userInfo) throws Exception;
 }

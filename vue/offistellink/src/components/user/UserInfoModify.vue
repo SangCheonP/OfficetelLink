@@ -1,7 +1,10 @@
 <script setup>
 import { ref, computed } from "vue";
 import { storeToRefs } from "pinia";
+import { useRouter } from "vue-router";
 import { useUserStore } from "@/stores/user";
+
+const router = useRouter();
 
 const userStore = useUserStore();
 const { userInfo } = storeToRefs(userStore);
@@ -10,6 +13,7 @@ const {
   updatePassword,
   updatePhoneNumber,
   checkCurrentPassword,
+  updateUserProfile
 } = userStore;
 
 const fileInput = ref(null);
@@ -117,7 +121,6 @@ const validPhoneNumber = computed(() => {
 
 // 사용자 정보 업데이트 함수
 const updateUserInfo = async () => {
-  console.log(userInfo.value.email, currentPassword.value);
   if (
     !(await checkCurrentPassword(userInfo.value.email, currentPassword.value))
   ) {
@@ -137,12 +140,10 @@ const updateUserInfo = async () => {
 
   try {
     // 서버에 새 비밀번호와 전화번호 업데이트
-    await updatePassword({
-      currentPassword: currentPassword.value,
-      newPassword: newPassword.value,
-    });
-    await updatePhoneNumber({ phone: phoneInput.value });
-    errorMessage.value = "정보가 성공적으로 변경되었습니다.";
+    console.log(userInfo.value.email, newPassword.value, phoneInput.value);
+    await updateUserProfile(userInfo.value.email, newPassword.value, phoneInput.value);
+    alert("정보가 성공적으로 변경되었습니다.")
+    router.replace("/user/mypage")
   } catch (error) {
     errorMessage.value = "정보 변경에 실패했습니다.";
   }
