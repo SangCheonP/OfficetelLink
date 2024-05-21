@@ -1,38 +1,28 @@
 <template>
   <div class="board-wrapper">
     <div class="board-container">
-      <h1 class="title">공지 사항</h1>
+      <h1 class="titleMain">궁금한 점, 나누고 싶은 이야기를 자유롭게 공유해보세요.</h1>
       <div class="form-group">
-        <button class="create-button" @click="navigateToCreateBoard">등록</button>
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>작성번호</th>
-              <th>제목</th>
-              <th>작성자</th>
-              <th>조회수</th>
-              <th>좋아요</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="notice in paginatedNotices" :key="notice.id">
-              <td data-label="작성번호">
+        <div class="notice-list">
+          <div v-for="notice in paginatedNotices" :key="notice.id" class="notice-card" @click="handleNoticeClick(notice.id)">
+            <div class="notice-header">
+              <div class="title-wrapper">
                 <div v-if="notice?.userEmail?.includes('admin')" class="admin-mark">
                   <img src="@/assets/images/pin.png" alt="admin Mark" class="admin-img" />
                 </div>
-                <div v-else>{{ notice.id }}</div>
-              </td>
-              <td data-label="제목">
-                <div @click="handleNoticeClick(notice.id)" class="notice-title">
-                  {{ notice.title }}
-                </div>
-              </td>
-              <td data-label="작성자">{{ notice.userEmail }}</td>
-              <td data-label="조회수">{{ notice.views }}</td>
-              <td data-label="좋아요">{{ notice.isLike }}</td>
-            </tr>
-          </tbody>
-        </table>
+                <div class="notice-title">{{ notice.title }}</div>
+              </div>
+            </div>
+            <div class="notice-body">
+              <div class="notice-stats">
+                <p class="notice-likes">좋아요: {{ notice.isLike }}</p>
+                <p class="notice-views">조회수: {{ notice.views }}</p>
+              </div>
+              <p class="notice-content">{{notice.content}}</p>
+              <p class="notice-author">{{ notice.userEmail }}</p>
+            </div>
+          </div>
+        </div>
         <div class="pagination">
           <button @click="handlePageChange(1)" :disabled="currentPage === 1">처음</button>
           <button @click="handlePageChange(currentPage - 1)" :disabled="currentPage === 1">이전</button>
@@ -40,11 +30,11 @@
           <button @click="handlePageChange(currentPage + 1)" :disabled="currentPage === totalPages">다음</button>
           <button @click="handlePageChange(totalPages)" :disabled="currentPage === totalPages">끝으로</button>
         </div>
+        <button class="create-button" @click="navigateToCreateBoard">등록</button>
       </div>
     </div>
   </div>
 </template>
-
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
@@ -55,7 +45,7 @@ const notices = ref([]);
 const router = useRouter();
 
 const currentPage = ref(1);
-const noticesPerPage = ref(6);
+const noticesPerPage = ref(8);
 
 const fetchNotices = async () => {
   try {
@@ -66,7 +56,6 @@ const fetchNotices = async () => {
   }
 };
 
-// Call fetchNotices once when the component is mounted
 onMounted(fetchNotices);
 
 const totalPages = computed(() => {
@@ -95,11 +84,12 @@ const navigateToCreateBoard = () => {
 </script>
 
 <style scoped>
-  .board-wrapper {
+.board-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  overflow: hidden;
   background: #9053c7;
   background: -webkit-linear-gradient(-135deg, #c850c0, #4158d0);
   background: -o-linear-gradient(-135deg, #c850c0, #4158d0);
@@ -108,15 +98,26 @@ const navigateToCreateBoard = () => {
 }
 
 .board-container {
+  margin-top: 30px;
   max-width: 1000px;
   width: 100%;
-  margin: 0 auto;
-  padding: 20px;
+  padding: 10px;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   min-height: 600px;
   font-family: 'Poppins', sans-serif;
+}
+
+.titleMain {
+  color: #4A90E2; /* 텍스트 색상 */
+  font-family: 'Arial', sans-serif; /* 글꼴 */
+  font-size: 2em; /* 글씨 크기 */
+  text-align: center; /* 텍스트 정렬 */
+  font-weight: bold; /* 글씨 굵기 */
+  margin-top: 20px; /* 상단 여백 */
+  margin-bottom: 40px; /* 하단 여백 */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* 텍스트 그림자 */
 }
 
 .title {
@@ -130,23 +131,65 @@ const navigateToCreateBoard = () => {
   margin-bottom: 20px;
 }
 
-.table {
-  width: 100%;
-  border-collapse: collapse;
+.notice-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  margin: 5px;
 }
 
-.table-hover tbody tr:hover {
-  background-color: #f5f5f5;
+.notice-card {
+  padding: 15px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.notice-card:hover {
+  background: #f1f1f1;
+}
+
+.notice-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.title-wrapper {
+  display: flex;
+  align-items: center;
 }
 
 .notice-title {
-  color: #007bff;
-  text-decoration: none;
-  cursor: pointer;
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #333;
+  margin-left: 8px;
+  text-align: center;
 }
 
-.notice-title:hover {
-  text-decoration: underline;
+.notice-body {
+  margin-top: 10px;
+}
+
+.notice-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.notice-author {
+  font-size: 0.9em;
+  color: #666;
+  text-align: center;
+}
+
+.notice-views, .notice-likes {
+  font-size: 0.9em;
+  color: #666;
 }
 
 .create-button {
@@ -167,7 +210,7 @@ const navigateToCreateBoard = () => {
 .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  padding-top: 30px;
 }
 
 .pagination button {
@@ -203,50 +246,39 @@ const navigateToCreateBoard = () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  height: 100%;
+  width: 20px;
+  height: 20px;
 }
 
 .admin-img {
-  max-width: 20px;
-  max-height: 20px;
+  max-width: 100%;
+  max-height: 100%;
 }
 
-/* Media queries for responsive table */
+/* Media queries for responsive design */
 @media (max-width: 768px) {
-  .table thead {
-    display: none;
+  .notice-card {
+    padding: 10px;
   }
 
-  .table tr {
-    display: block;
-    margin-bottom: 10px;
+  .notice-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
-  .table td {
-    display: block;
-    text-align: right;
-    border-bottom: 1px solid #ddd;
-    position: relative;
-    padding-left: 50%;
+  .title-wrapper {
+    justify-content: center;
+    width: 100%;
   }
 
-  .table td::before {
-    content: attr(data-label);
-    position: absolute;
-    left: 10px;
-    width: 50%;
-    padding-right: 10px;
+  .notice-stats {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .notice-author {
     text-align: left;
-    font-weight: bold;
-  }
-
-  .admin-mark {
-    justify-content: flex-start;
-  }
-
-  .admin-img {
-    margin-left: 0;
+    margin-top: 10px;
   }
 }
 </style>

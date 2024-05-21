@@ -2,28 +2,35 @@
   <div class="board-wrapper">
     <div class="board-container">
       <template v-if="editMode">
+        <div class="title">제목</div>
         <input v-model="editForm.title" class="edit-input" />
-        <textarea v-model="editForm.content" class="edit-textarea"></textarea>
+        <div class="content">내용</div>
+        <div ref="editorContainer" class="edit-textarea"></div>
       </template>
       <template v-else>
         <h1>{{ notice.title }}</h1>
         <div class="notice-meta">
-          <span>조회수: {{ notice.views }}</span>
-          <span>작성자: {{ notice.userEmail }}</span>
+          <div class="meta-left">
+            <img 
+              src="@/assets/images/ddabong.png" 
+              alt="Like Button" 
+              class="good-img" 
+              @click="confirmLike(notice.id)" 
+              :class="{ liked: hasLiked }"
+            />:
+            <span>{{ notice.isLike }}</span>
+            <img 
+              src="@/assets/images/views.png" 
+              alt="Like Views" 
+              class="good-img" 
+            />:
+            <span> {{ notice.views }}</span>
+          </div>
+          <div class="meta-right">
+            <span>작성자: {{ notice.userEmail }}</span>
+          </div>
         </div>
-        <div class="notice-content">
-          {{ notice.content }}
-        </div>
-        <div class="like-content">
-          <img 
-            src="@/assets/images/ddabong.png" 
-            alt="Like Button" 
-            class="good-img" 
-            @click="confirmLike(notice.id)" 
-            :class="{ liked: hasLiked }"
-          />
-          <span>: {{ notice.isLike }}</span>
-        </div>
+        <div class="notice-content" v-html="notice.content"></div>
         <div class="file-content">
           <span>파일: {{ notice.fileName }}</span>
         </div>
@@ -40,9 +47,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
+import Quill from 'quill';
+import 'quill/dist/quill.snow.css';
 
 const notice = ref({});
 const editForm = ref({
@@ -52,7 +61,10 @@ const editForm = ref({
 const editMode = ref(false);
 const route = useRoute();
 const router = useRouter();
-const hasLiked = ref(false); // 사용자가 좋아요를 눌렀는지 여부를 추적
+const hasLiked = ref(false);
+
+const editor = ref(null);
+const editorContainer = ref(null);
 
 const fetchNotice = async () => {
   try {
@@ -88,6 +100,7 @@ const confirmUpdate = async () => {
 
 const updateNotice = async () => {
   try {
+    editForm.value.content = editor.value.root.innerHTML;
     const response = await axios.put(`http://localhost:8080/notices/${route.params.id}`, editForm.value);
     notice.value = response.data;
     editMode.value = false;
@@ -115,12 +128,46 @@ const confirmLike = async (id) => {
 const likeNotice = async (id) => {
   try {
     await axios.post(`http://localhost:8080/notices/${id}/like`);
-    notice.value.isLike += 1; // 좋아요 수 갱신
-    hasLiked.value = true; // 좋아요를 눌렀음을 표시
+    notice.value.isLike += 1;
+    hasLiked.value = true;
   } catch (error) {
     console.error('Error liking notice:', error);
   }
 };
+
+const initializeQuillEditor = () => {
+  if (editorContainer.value) {
+    editor.value = new Quill(editorContainer.value, {
+      theme: 'snow',
+      placeholder: '내용을 입력하세요...',
+      modules: {
+        toolbar: [
+          ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block'],
+          [{ 'header': 1 }, { 'header': 2 }],
+          [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+          [{ 'script': 'sub' }, { 'script': 'super' }],
+          [{ 'indent': '-1' }, { 'indent': '+1' }],
+          [{ 'direction': 'rtl' }],
+          [{ 'size': ['small', false, 'large', 'huge'] }],
+          [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+          [{ 'color': [] }, { 'background': [] }],
+          [{ 'font': [] }],
+          [{ 'align': [] }],
+          ['link', 'clean']
+        ]
+      }
+    });
+    editor.value.root.innerHTML = editForm.value.content;
+  }
+};
+
+watch(editMode, (newValue) => {
+  if (newValue) {
+    setTimeout(() => {
+      initializeQuillEditor();
+    }, 0);
+  }
+});
 
 onMounted(fetchNotice);
 </script>
@@ -152,49 +199,61 @@ onMounted(fetchNotice);
   flex-direction: column;
 }
 
-.notice-detail {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
 h1 {
+  font-size: 2em;
   font-family: 'Poppins', sans-serif;
   color: #333;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .notice-meta {
   display: flex;
   justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.meta-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.meta-right {
   font-family: 'Poppins', sans-serif;
   color: #666;
-  margin-bottom: 10px;
 }
 
 .notice-content {
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
   font-family: 'Poppins', sans-serif;
   color: #666;
   margin-bottom: 20px;
 }
 
+.notice-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
 .file-content {
-  margin-top: 320px;
-  margin-left: 450px;
   font-family: 'Poppins', sans-serif;
   color: #666;
+  margin-bottom: 20px;
 }
 
 .good-img {
   width: 30px;
   height: 30px;
-  cursor: pointer; /* 클릭 가능하게 커서 변경 */
+  cursor: pointer;
 }
 
 .good-img.liked {
-  filter: grayscale(100%); /* 이미 좋아요를 누른 경우 이미지 회색 처리 */
+  filter: grayscale(100%);
 }
 
 .notice-file {
@@ -230,6 +289,15 @@ h1 {
 }
 
 .edit-textarea {
-  height: 300px; /* 텍스트 영역의 높이를 증가 */
+  height: 300px;
+  margin-bottom: 20px;
+}
+
+.title,
+.content {
+  margin: 20px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: bold;
 }
 </style>
