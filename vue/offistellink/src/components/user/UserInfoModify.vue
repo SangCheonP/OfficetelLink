@@ -3,6 +3,7 @@ import { ref, computed } from "vue";
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/stores/user";
+import Modal from "@/components/user/UserInfoModifyModal.vue";
 
 const router = useRouter();
 
@@ -13,16 +14,19 @@ const {
   updatePassword,
   updatePhoneNumber,
   checkCurrentPassword,
-  updateUserProfile
+  updateUserProfile,
 } = userStore;
 
 const fileInput = ref(null);
 const croppedImageUrl = ref(null);
+
 const currentPassword = ref("");
 const newPassword = ref("");
 const confirmPassword = ref("");
 const phoneInput = ref(userInfo.value.phone); // 전화번호 입력값을 ref로 관리
 const errorMessage = ref("");
+
+const isModalOpen = ref(false); // 모달 열림 여부 관리
 
 // 프로필 이미지 변경 함수
 const triggerFileInput = () => {
@@ -141,12 +145,25 @@ const updateUserInfo = async () => {
   try {
     // 서버에 새 비밀번호와 전화번호 업데이트
     console.log(userInfo.value.email, newPassword.value, phoneInput.value);
-    await updateUserProfile(userInfo.value.email, newPassword.value, phoneInput.value);
-    alert("정보가 성공적으로 변경되었습니다.")
-    router.replace("/user/mypage")
+    await updateUserProfile(
+      userInfo.value.email,
+      newPassword.value,
+      phoneInput.value
+    );
+    alert("정보가 성공적으로 변경되었습니다.");
+    router.replace("/user/mypage");
   } catch (error) {
     errorMessage.value = "정보 변경에 실패했습니다.";
   }
+};
+
+const openModal = () => {
+  isModalOpen.value = true;
+  console.log(isModalOpen.value);
+};
+
+const closeModal = () => {
+  isModalOpen.value = false;
 };
 </script>
 
@@ -178,7 +195,7 @@ const updateUserInfo = async () => {
         <button class="mypage-form-btn" @click="triggerFileInput">
           이미지 변경
         </button>
-        <button class="mypage-form-btn">테두리 변경</button>
+        <button class="mypage-form-btn" @click="openModal">테두리 변경</button>
       </div>
 
       <!-- 얇고 흐릿한 실선 추가 -->
@@ -260,6 +277,9 @@ const updateUserInfo = async () => {
         <button class="mypage-form-btn" @click="updateUserInfo">변경</button>
       </div>
     </div>
+
+    <!-- 모달 컴포넌트 -->
+    <Modal :isOpen="isModalOpen" @close="closeModal"></Modal>
   </section>
 </template>
 
