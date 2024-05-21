@@ -13,7 +13,7 @@
       <option v-for="road in roadOptions" :key="road" :value="road">{{ road }}</option>
     </select>
     <div class="input-group-append">
-      <button class="btn btn-outline-secondary" type="button" @click="search">검색</button>
+      <button class="btn btn-outline-secondary custom-button" type="button" @click="search">검색</button>
     </div>
   </div>
 </template>
@@ -53,31 +53,40 @@ export default {
 
 <style scoped>
 .search-bar {
+  margin-left:-10px;
   margin-bottom: 20px;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  background-color: #f9f9f9;
+  background-color: transparent;
+  display: flex;
+  padding: 15px; /* Increased padding for size */
 }
 
 .custom-select {
   border: 1px solid #ced4da;
   border-radius: 5px;
-  padding: 10px;
-  margin-right: 10px;
-  font-size: 14px;
+  padding: 5px; /* Increased padding for size */
+  margin-right: 20px;
+  font-size: 18px; /* Increased font size */
+  flex: 1;
+  font-family: 'Arial', sans-serif; /* Font style */
+  font-weight: bold; /* Font weight */
+  color: #333; /* Font color */
 }
 
-.btn-custom {
+.input-group-append {
+  display: flex;
+}
+
+.custom-button {
   background-color: rgba(87, 184, 70, 0.8);
   border-color: rgba(87, 184, 70, 0.8);
   color: white;
   border-radius: 5px;
   padding: 10px 20px;
   font-size: 14px;
-}
-
-.btn-custom:hover {
-  background-color: #0056b3;
-  border-color: #0056b3;
+  flex: 1;
+  text-align: center;
+  white-space: nowrap;
 }
 </style>

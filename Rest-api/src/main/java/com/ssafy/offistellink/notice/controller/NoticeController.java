@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -28,9 +27,15 @@ public class NoticeController {
     @PostMapping
     public ResponseEntity<String> createNotice(@RequestBody NoticeDto noticeDto) throws SQLException {
 
-//        String userEmail = principal.getName();
-        noticeService.insertNotice(noticeDto.getTitle(), noticeDto.getTitle(), null);
+        noticeService.insertNotice(noticeDto);
         return ResponseEntity.status(201).body("공지사항이 등록되었습니다");
+    }
+
+    //좋아요 버튼
+    @PostMapping("/{id}/like")
+    public ResponseEntity<Void> incrementLikes(@PathVariable int id) throws SQLException {
+        noticeService.incrementLikes(id);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}")

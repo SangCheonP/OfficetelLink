@@ -35,11 +35,11 @@ public class NoticeServiceImpl implements NoticeService {
     }
 
     @Transactional
-    public void insertNotice(String title, String content, String userEmail) throws SQLException {
-        NoticeDto noticeDto = new NoticeDto();
-        noticeDto.setTitle(title);
-        noticeDto.setContent(content);
-        noticeDto.setUserEmail(userEmail); // 사용자 이메일 설정
+    public void insertNotice(NoticeDto noticeDto) throws SQLException {
+//        NoticeDto noticeDto = new NoticeDto();
+//        noticeDto.setTitle(title);
+//        noticeDto.setContent(content);
+//        noticeDto.setUserEmail(userEmail); // 사용자 이메일 설정
 
         noticeMapper.insertNotice(noticeDto);
     }
@@ -101,5 +101,10 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public void incrementView(int id) {
         noticeMapper.incrementView(id);
+    }
+
+    @Transactional
+    public void incrementLikes(int id) {
+        noticeMapper.incrementLikes(id);
     }
 }

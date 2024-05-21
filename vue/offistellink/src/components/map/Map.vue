@@ -1,13 +1,9 @@
 <template>
   <div class="board-wrapper">
-    <header class="navbar navbar-expand navbar-dark bg-dark">
-      <br><br><br><br>
-    </header>
-
     <div class="container-fluid mt-3">
       <!-- 맵 필터링 기능 구역 -->
-      <div class="row mb-3">
-        <div class="col-12">
+      <div class="row mb-3 search-bar">
+        <div class="col-12 select-bar" style="margin: 10px">
           <MapSelectBar
             :selectedGu="selectedGu"
             :selectedDong="selectedDong"
@@ -16,6 +12,7 @@
             @update:selectedDong="selectedDong = $event"
             @update:selectedRoad="selectedRoad = $event"
             @search="handleSearch"
+            class="custom-map-select-bar"
           />
         </div>
       </div>
@@ -33,10 +30,10 @@
         </div>
         <!-- 지도 api 및 클러스터링 -->
         <div class="col-md-7 mb-3">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title text-brand">Map</h5>
-              <div ref="mapContainer" style="width: 100%; height: 400px;"></div>
+          <div class="card map-card">
+            <div class="card-body map-card-body">
+              <!-- <h5 class="card-title text-brand">Map</h5> -->
+              <div ref="mapContainer" class="map-container"></div>
               <div v-for="marker in markersDataArray.value" :key="marker.roadName">
                 <p>{{ marker.gu }} {{ marker.dong }} {{ marker.roadName }}</p>
               </div>
@@ -148,7 +145,7 @@ export default {
       if (clusterer) {
         clusterer.clear();
       }
-      console.log(markersDataArray.value)
+  
       const imageSize = new window.kakao.maps.Size(64, 69);
       const imageOption = { offset: new window.kakao.maps.Point(27, 69) };
       const markerImage = new window.kakao.maps.MarkerImage(markerImageSrc, imageSize, imageOption);
@@ -281,20 +278,43 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 100px;
+  background: #9053c7;
+  background: -webkit-linear-gradient(-135deg, #c850c0, #4158d0);
+  background: -o-linear-gradient(-135deg, #c850c0, #4158d0);
+  background: -moz-linear-gradient(-135deg, #c850c0, #4158d0);
+  background: linear-gradient(-135deg, #c850c0, #4158d0);
 }
 .board-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: #9053c7;
-    background: -webkit-linear-gradient(-135deg, #c850c0, #4158d0);
-    background: -o-linear-gradient(-135deg, #c850c0, #4158d0);
-    background: -moz-linear-gradient(-135deg, #c850c0, #4158d0);
-    background: linear-gradient(-135deg, #c850c0, #4158d0);
+    margin-left: 150px;
+    margin-right: 150px;   
+}
+.container-fluid {
+  border: 2px solid darkslategray; /* 검은색 테두리 */
+  border-radius: 15px;
+  padding: 20px; /* 패딩 설정 */
+  background: rgb(247, 246, 246);
+}
+.card {
+  border-radius: 15px;
+  margin: 0; /* 카드 요소의 마진 제거 */
+  background: rgb(247, 246, 246);
+}
+.card-body {
+  padding: 0; /* 카드 바디의 패딩 제거 */
+
+  background: rgb(247, 246, 246);
 }
 
+.map-container {
+  width: 100%;
+  height: 400px;
+  border-radius: 15px; /* 둥근 테두리 */
+}
 table {
   width: 100%;
   border-collapse: collapse;

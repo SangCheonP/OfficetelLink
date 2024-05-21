@@ -18,4 +18,6 @@ public interface NoticeMapper {
     void deleteNotice(int id); //공지사항 삭제
 
     void incrementView(int id); //조회수 증가
+
+    void incrementLikes(int id); //좋아요 증가
 }

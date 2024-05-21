@@ -10,6 +10,8 @@
         <result column="views" property="views"/>
         <result column="created_at" property="createdAt"/>
         <result column="updated_at" property="updatedAt"/>
+        <result column="is_pinned" property="isPinned"/>
+        <result column="is_like" property="isLike"/>
     </resultMap>
 
     <!-- 개별 공지사항 조회 -->
@@ -21,13 +23,14 @@
 
     <!-- 공지사항 조회 -->
     <select id="getAllNotices" resultMap="notices">
-        SELECT *
-        FROM notices;
+        SELECT *, (CASE WHEN user_email LIKE '%admin%' THEN true ELSE false END) AS is_pinned
+        FROM notices
+        ORDER BY is_pinned DESC, created_at DESC;
     </select>
 
     <insert id="insertNotice" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO notices (title, content, views, created_at, updated_at, user_email)
-        VALUES (#{title}, #{content}, 0, now(), now(), #{userEmail})
+        INSERT INTO notices (title, content, views, created_at, updated_at, is_pinned, is_like, user_email)
+        VALUES (#{title}, #{content}, 0, now(), now(), false, 0, #{userEmail})
     </insert>
 
     <update id="updateNotice">
@@ -51,4 +54,10 @@
         WHERE id = #{id}
     </update>
 
+    <!-- 좋아요 수 증가 -->
+    <update id="incrementLikes" parameterType="int">
+        UPDATE notices
+        SET is_like = is_like + 1
+        WHERE id = #{id}
+    </update>
 </mapper>
