@@ -7,7 +7,8 @@ const router = useRouter();
 
 const userStore = useUserStore();
 
-const { isLogin, isValidToken, userInfo } = storeToRefs(userStore);
+const { isLogin, isValidToken, userInfo, borderImages
+ } = storeToRefs(userStore);
 const { userLogout } = userStore;
 
 const logout = () => {
@@ -52,7 +53,7 @@ const logout = () => {
                 class="nav-link"
                 :to="{ name: 'home' }"
                 exact-active-class="active"
-                >Home</router-link
+                >메인 페이지</router-link
               >
             </li>
             <!-- 게시판 페이지-->
@@ -73,32 +74,6 @@ const logout = () => {
                 >상점</router-link
               >
             </li>
-            <!-- <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                id="navbarDropdown"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-                >Pages</a
-              >
-              <div class="dropdown-menu">
-                <router-link class="dropdown-item" to="/property-single"
-                  >Property Single</router-link
-                >
-                <router-link class="dropdown-item" to="/blog-single"
-                  >Blog Single</router-link
-                >
-                <router-link class="dropdown-item" to="/agents-grid"
-                  >Agents Grid</router-link
-                >
-                <router-link class="dropdown-item" to="/agent-single"
-                  >Agent Single</router-link
-                >
-              </div>
-            </li> -->
           </ul>
         </div>
 
@@ -111,23 +86,34 @@ const logout = () => {
             aria-expanded="false"
           >
             <!-- userInfo.profileImageUrl이 null이거나 비어 있는지 확인 -->
-            <img
-              v-if="userInfo && userInfo.profileImageUrl"
-              :src="`http://localhost:8080${
-                userInfo.profileImageUrl
-              }?t=${Date.now()}`"
-              alt="login"
-              id="loginImg"
-              class="login-img"
-            />
-            <!-- 기본 이미지를 보여줌 -->
-            <img
-              v-else
-              src="/src/assets/images/no-image.png"
-              alt="no image"
-              id="loginImg"
-              class="login-img"
-            />
+            <div class="image-container">
+              <img
+                v-if="userInfo && userInfo.profileImageUrl"
+                :src="`http://localhost:8080${
+                  userInfo.profileImageUrl
+                }?t=${Date.now()}`"
+                alt="login"
+                id="loginImg"
+                class="login-img"
+              />
+              <img
+                v-if="userInfo && userInfo.profileImageUrl"
+                :src="`http://localhost:5173${
+                  borderImages[userInfo.borderId]
+                }?t=${Date.now()}`"
+                alt="login"
+                id="loginBorderImg"
+                class="login-border-img"
+              />
+              <!-- 기본 이미지를 보여줌 -->
+              <img
+                v-else
+                src="/src/assets/images/no-image.png"
+                alt="no image"
+                id="loginImg"
+                class="login-img"
+              />
+            </div>
           </button>
           <div class="dropdown-menu dropdown-menu-center">
             <router-link class="dropdown-item" :to="{ name: 'user-mypage' }"
@@ -209,15 +195,31 @@ a:hover {
   cursor: pointer; /* 커서 모양 변경 */
 }
 
+.image-container {
+  position: relative;
+}
+
 .login-img {
-  width: 50px; /* 원하는 크기로 조정 */
+  width: 46px; /* 원하는 크기로 조정 */
   height: auto;
   border-radius: 50%;
-  border: 2px solid rgb(0, 0, 0, 0.3);
+  position: absolute; /* 절대 위치로 설정 */
+  top: 2px; /* 테두리 이미지 내부로 약간 내려줌 */
+  left: 2px; /* 테두리 이미지 내부로 약간 내려줌 */
+  z-index: 1; /* 테두리 이미지보다 위에 위치하도록 설정 */
   transition: transform 0.3s ease; /* 마우스를 올렸을 때의 애니메이션 효과 */
 }
 
-.login-img:hover {
+.login-border-img {
+  width: 50px; /* 원하는 크기로 조정 */
+  height: auto;
+  border-radius: 50%;
+  transition: transform 0.3s ease; /* 마우스를 올렸을 때의 애니메이션 효과 */
+  z-index: 0; /* 로그인 이미지 아래에 위치하도록 설정 */
+}
+
+.image-container:hover .login-img,
+.image-container:hover .login-border-img {
   transform: scale(1.1); /* 마우스를 올렸을 때 이미지가 커지는 효과 */
 }
 

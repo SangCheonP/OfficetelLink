@@ -28,6 +28,8 @@
         <result column="created_at" property="createdAt"/>
         <result column="refresh_token" property="refreshToken"/>
         <result column="profile_image_url" property="profileImageUrl"/>
+        <result column="border_id" property="borderId"/>
+        <result column="exp_id" property="expId"/>
     </resultMap>
 
     <!--  모든 사용자를 조회한다. selectAll은 DAO인터페이스, EmployeeDao 클래스의 메소드 이름과 일치시킨다. -->
@@ -54,7 +56,7 @@
     </select>
 
     <select id="userInfo" parameterType="string" resultMap="user">
-        select name, email, phone, point, admin, created_at, profile_image_url
+        select name, email, phone, point, border_id, exp_id, admin, created_at, profile_image_url
         from users
         where email = #{email}
     </select>
@@ -99,6 +101,12 @@
         UPDATE users
         SET password = #{password}, phone = #{phone}
         WHERE email = #{email};
+    </update>
+
+    <update id="updateProfileBorderExp" parameterType="map">
+        update users
+        set border_id = #{borderId}, exp_id = #{expId}
+        where email = #{email};
     </update>
 
 </mapper>

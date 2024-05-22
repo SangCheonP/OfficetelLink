@@ -19,4 +19,5 @@ public interface UserService {
     String getProfileImageUrl(String email) throws Exception;
     boolean checkPassword(String email, String password) throws Exception;
     boolean updateProfile(Map<String, String> userInfo) throws Exception;
+    boolean updateProfileBorderExp(Map<String, Object> updateInfo) throws Exception;
 }

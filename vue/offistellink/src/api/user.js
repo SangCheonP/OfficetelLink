@@ -51,6 +51,12 @@ async function updateProfile(email, password, phone, success, fail){
   .catch(fail)
 }
 
+async function updateProfileBorderAndExp(email, border_id, exp_id, success, fail){
+  await local
+  .post(`/user/update-profile/border/${border_id}/exp/${exp_id}`, {email})
+  .then(success)
+  .catch(fail)
+}
 export {
   userConfirm,
   findByEmail,
@@ -58,5 +64,7 @@ export {
   logout,
   imageUpdate,
   checkPassword,
-  updateProfile
+  updateProfile,
+  updateProfileBorderAndExp
+
 };

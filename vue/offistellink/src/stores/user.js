@@ -9,7 +9,8 @@ import {
   logout,
   imageUpdate,
   checkPassword,
-  updateProfile
+  updateProfile,
+  updateProfileBorderAndExp
 } from "@/api/user";
 import { httpStatusCode } from "@/util/http-status";
 import { jwtDecode } from "jwt-decode";
@@ -23,6 +24,19 @@ export const useUserStore = defineStore(
     const isLoginError = ref(false);
     const userInfo = ref(null);
     const isValidToken = ref(false);
+
+    const borderImages = ref([
+      "/src/assets/images/borders/1.png",
+      "/src/assets/images/borders/2.png",
+      "/src/assets/images/borders/3.png",
+      "/src/assets/images/borders/4.png",
+      "/src/assets/images/borders/5.png",
+      "/src/assets/images/borders/6.png",
+      "/src/assets/images/borders/7.png",
+      "/src/assets/images/borders/8.png",
+      "/src/assets/images/borders/9.png",
+      "/src/assets/images/borders/10.png",
+    ]); // 이미지 경로 배열
 
     const userLogin = async (loginUser) => {
       await userConfirm(
@@ -192,8 +206,6 @@ export const useUserStore = defineStore(
         (response) =>{
           console.log(response);
           if (response.status === httpStatusCode.OK) {
-            console.log("정보를 변경했습니다.");
-            isValid = true;
           } else {
             console.log("정보 변경에 실패했습니다.");
           }
@@ -204,7 +216,26 @@ export const useUserStore = defineStore(
       )
     }
 
+    const updateUserProfileBorderAndExp = async(email, border_id, exp_id) => {
+      await updateProfileBorderAndExp(email, border_id, exp_id,
+        (response) =>{
+          console.log(response);
+          if (response.status === httpStatusCode.OK) {
+            console.log("정보를 변경했습니다.");
+            userInfo.value.borderId = border_id;
+            userInfo.value.expId = exp_id;
+          } else {
+            console.log("정보 변경에 실패했습니다.");
+          }
+        },
+        (error) => {
+          console.error("프로필 업데이트 중 오류 발생: ", error);
+        }
+      )
+    }
+
     return {
+      borderImages,
       isLogin,
       isLoginError,
       userInfo,
@@ -215,7 +246,8 @@ export const useUserStore = defineStore(
       userLogout,
       profileImageUpdate,
       checkCurrentPassword,
-      updateUserProfile
+      updateUserProfile,
+      updateUserProfileBorderAndExp
     };
   },
   {

@@ -4,7 +4,7 @@ import { storeToRefs } from "pinia";
 import { useUserStore } from "@/stores/user";
 
 const userStore = useUserStore();
-const { userInfo } = storeToRefs(userStore);
+const { userInfo, borderImages } = storeToRefs(userStore);
 const { userLogout } = userStore;
 
 // 로그아웃 함수
@@ -71,8 +71,20 @@ onMounted(() => {
         </div>
         <div class="mypage-pic" v-else>
           <img
-            :src="`http://localhost:8080${userInfo.profileImageUrl}?t=${Date.now()}`"
+            :src="`http://localhost:8080${
+              userInfo.profileImageUrl
+            }?t=${Date.now()}`"
             alt="IMG"
+            id="loginImg"
+            class="login-img"
+          />
+          <img
+            :src="`http://localhost:5173${
+              borderImages[userInfo.borderId]
+            }?t=${Date.now()}`"
+            alt="login"
+            id="loginBorderImg"
+            class="login-border-img"
           />
         </div>
       </div>
@@ -92,12 +104,19 @@ onMounted(() => {
             <label>댓글 :</label>
             <span>3 </span>
             <label>포인트 :</label>
-            <router-link :to="{name: 'shop'}">{{ userInfo.point }}</router-link>
+            <router-link :to="{ name: 'shop' }">{{
+              userInfo.point
+            }}</router-link>
           </div>
         </div>
         <div class="container-mypage-form-btn">
-          <router-link :to="{ name: 'user-modify' }" class="mypage-form-btn">정보 수정</router-link>
-          <router-link :to="{ name: 'home' }" class="mypage-form-btn" @click="logout"
+          <router-link :to="{ name: 'user-modify' }" class="mypage-form-btn"
+            >정보 수정</router-link
+          >
+          <router-link
+            :to="{ name: 'home' }"
+            class="mypage-form-btn"
+            @click="logout"
             >로그아웃</router-link
           >
         </div>
@@ -160,10 +179,13 @@ onMounted(() => {
     </div>
 
     <div class="text-center p-t-12">
-      <router-link class="txt2" :to="{ name: 'home' }">홈으로 돌아가기</router-link>
+      <router-link class="txt2" :to="{ name: 'home' }"
+        >홈으로 돌아가기</router-link
+      >
     </div>
   </section>
 </template>
+
 
 <style scoped>
 .wrap-mypage {
@@ -202,8 +224,23 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  border: 5px solid rgb(0, 0, 0, 0.1);
   object-fit: cover;
+}
+
+.login-img {
+  z-index: 1; /* login-img가 뒤로 가도록 낮은 z-index 설정 */
+  position: relative;
+}
+
+.login-border-img {
+  z-index: 2; /* login-border-img가 앞에 오도록 높은 z-index 설정 */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  pointer-events: none; /* 이미지가 클릭되지 않도록 설정 */
 }
 
 .mypage-info {
@@ -233,14 +270,15 @@ onMounted(() => {
   padding-right: 13px;
 }
 
-.user-info-field span, a {
+.user-info-field span,
+a {
   font-family: "Poppins", sans-serif;
   font-size: 20px;
   color: #333333;
   line-height: 1.5;
 }
 
-.user-info-field-addition a{
+.user-info-field-addition a {
   color: cornflowerblue;
   text-decoration: underline;
 }
@@ -322,7 +360,6 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0 25px;
   transition: all 0.4s;
   border: none;
   cursor: pointer;
@@ -352,7 +389,6 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0 25px;
   transition: all 0.4s;
   border: none;
   cursor: pointer;

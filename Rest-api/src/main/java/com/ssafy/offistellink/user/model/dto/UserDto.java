@@ -27,5 +27,9 @@ public class UserDto {
     private String refreshToken;
     @Schema(description = "프로필 이미지 URL")
     private String profileImageUrl;
+    @Schema(description = "테두리")
+    private int borderId;
+    @Schema(description = "경험치")
+    private int expId;
 }
 

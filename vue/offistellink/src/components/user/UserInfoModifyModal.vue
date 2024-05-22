@@ -1,10 +1,11 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useUserStore } from "@/stores/user";
 
 const userStore = useUserStore();
-const { userInfo } = storeToRefs(userStore);
+const { userInfo, borderImages } = storeToRefs(userStore);
+const { updateUserProfileBorderAndExp } = userStore;
 
 const props = defineProps({
   isOpen: Boolean,
@@ -14,28 +15,42 @@ const emit = defineEmits(["close"]);
 
 // 선택된 탭 및 테두리 이미지 관련 상태
 const selectedTab = ref("테두리");
-const selectedImage = ref(""); // 선택된 테두리 이미지
-const borderImages = [
-  "/src/assets/images/borders/1.png",
-  "/src/assets/images/borders/2.png",
-  "/src/assets/images/borders/3.png",
-  "/src/assets/images/borders/4.png",
-  "/src/assets/images/borders/5.png",
-  "/src/assets/images/borders/6.png",
-  "/src/assets/images/borders/7.png",
-  "/src/assets/images/borders/8.png",
-  "/src/assets/images/borders/9.png",
-  "/src/assets/images/borders/10.png",
-]; // 이미지 경로 배열
+const selectedImage = ref(userInfo.value.borderId); // 선택된 테두리 이미지
+
+// 모달이 열릴 때 selectedImage 값을 초기화
+watch(
+  () => props.isOpen,
+  (newValue) => {
+    if (newValue) {
+      selectedImage.value = userInfo.value.borderId;
+    }
+  }
+);
 
 const closeModal = () => {
   emit("close");
 };
 
-const applyChanges = () => {
-  // 선택한 테두리 이미지를 적용하는 로직을 여기에 추가
-  console.log("Selected Border Image:", selectedImage.value);
+const applyChanges = async () => {
+  const borderIndex = selectedImage.value;
+  const experienceIndex = 0; // 경험치의 인덱스를 설정하세요. 예제에서는 0으로 설정.
+
+  // 프로필 테두리와 경험치 업데이트
+  await updateUserProfileBorderAndExp(
+    userInfo.value.email,
+    borderIndex,
+    experienceIndex
+  );
+
+  // userInfo.borderId를 업데이트
+  userInfo.value.borderId = borderIndex;
+
+  // 모달 닫기
   closeModal();
+};
+
+const selectBorderImage = (index) => {
+  selectedImage.value = index;
 };
 </script>
 
@@ -56,19 +71,21 @@ const applyChanges = () => {
           <div class="preview-section text-center">
             <h3>미리보기</h3>
             <div class="preview-border-container">
-              <div
-                class="preview-border"
-                :style="{
-                  backgroundImage: `url(${selectedImage})`,
-                  backgroundSize: 'cover',
-                }"
-              ></div>
               <img
-                class="preview-image"
                 :src="`http://localhost:8080${
                   userInfo.profileImageUrl
                 }?t=${Date.now()}`"
                 alt="IMG"
+                id="previewImg"
+                class="preview-image"
+              />
+              <img
+                :src="`http://localhost:5173${
+                  borderImages[selectedImage]
+                }?t=${Date.now()}`"
+                alt="login"
+                id="profileImg"
+                class="profile-img"
               />
             </div>
             <div class="progress-bar-container">
@@ -98,8 +115,8 @@ const applyChanges = () => {
                 class="option border rounded p-2 m-1"
                 v-for="(image, index) in borderImages"
                 :key="index"
-                :class="{ selected: selectedImage === image }"
-                @click="() => (selectedImage = image)"
+                :class="{ selected: selectedImage === index }"
+                @click="() => selectBorderImage(index)"
               >
                 <img :src="image" class="border-thumbnail" />
               </div>
@@ -136,7 +153,7 @@ const applyChanges = () => {
 
 .modal-content {
   background: white;
-  width: 70%;
+  width: 50%;
   height: 70%;
   padding: 20px;
   border-radius: 10px;
@@ -152,7 +169,7 @@ const applyChanges = () => {
 
 .modal-title {
   font-family: "Poppins", sans-serif;
-  font-size: 37px;
+  font-size: 24px;
   flex-grow: 1;
   text-align: center;
 }
@@ -182,18 +199,6 @@ const applyChanges = () => {
   margin: 0 auto;
 }
 
-.preview-border {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 170px; /* 이미지 크기 */
-  height: 170px; /* 이미지 크기 */
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background-size: cover;
-  z-index: 1;
-}
-
 .preview-image {
   position: absolute;
   top: 50%;
@@ -202,31 +207,18 @@ const applyChanges = () => {
   height: 160px; /* 이미지 크기 */
   transform: translate(-50%, -50%);
   border-radius: 50%;
+  z-index: 1;
+}
+
+.profile-img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 170px; /* 이미지 크기 */
+  height: 170px; /* 이미지 크기 */
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
   z-index: 0;
-}
-
-.user-experience {
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-.user-experience-labels {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 5px;
-}
-
-.current-rank {
-  font-family: "Poppins", sans-serif;
-  font-size: 16px;
-  color: #ec9a00;
-  font-weight: bold;
-}
-
-.next-rank {
-  font-family: "Poppins", sans-serif;
-  font-size: 16px;
-  color: #666666;
 }
 
 .progress-bar-container {
@@ -280,5 +272,32 @@ const applyChanges = () => {
   height: 100%;
   object-fit: cover;
   border-radius: 4px;
+}
+
+/* 미디어 쿼리를 사용하여 화면 크기에 따라 이미지 크기 조정 */
+@media (max-width: 768px) {
+  .preview-border-container {
+    width: 150px;
+    height: 150px;
+  }
+
+  .preview-image,
+  .profile-img {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .preview-border-container {
+    width: 100px;
+    height: 100px;
+  }
+
+  .preview-image,
+  .profile-img {
+    width: 80px;
+    height: 80px;
+  }
 }
 </style>

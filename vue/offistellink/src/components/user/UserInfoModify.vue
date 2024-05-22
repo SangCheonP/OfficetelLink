@@ -8,7 +8,7 @@ import Modal from "@/components/user/UserInfoModifyModal.vue";
 const router = useRouter();
 
 const userStore = useUserStore();
-const { userInfo } = storeToRefs(userStore);
+const { userInfo, borderImages } = storeToRefs(userStore);
 const {
   profileImageUpdate,
   updatePassword,
@@ -169,6 +169,9 @@ const closeModal = () => {
 
 <template>
   <section class="wrap-mypage">
+    <!-- 닫기 버튼 -->
+    <router-link to="/user/mypage" class="close-button">X</router-link>
+    
     <!-- 사용자 정보 컴포넌트 -->
     <div class="section">
       <div class="image-container">
@@ -181,6 +184,16 @@ const closeModal = () => {
               userInfo.profileImageUrl
             }?t=${Date.now()}`"
             alt="IMG"
+            id="loginImg"
+            class="login-img"
+          />
+          <img
+            :src="`http://localhost:5173${
+              borderImages[userInfo.borderId]
+            }?t=${Date.now()}`"
+            alt="login"
+            id="loginBorderImg"
+            class="login-border-img"
           />
         </div>
       </div>
@@ -271,10 +284,7 @@ const closeModal = () => {
       </div>
 
       <div class="container-mypage-form-btn">
-        <router-link :to="{ name: 'user-mypage' }" class="mypage-form-btn"
-          >취소</router-link
-        >
-        <button class="mypage-form-btn" @click="updateUserInfo">변경</button>
+        <router-link class="mypage-form-btn" @click="updateUserInfo">변경</router-link>
       </div>
     </div>
 
@@ -296,6 +306,7 @@ const closeModal = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative; /* 추가된 속성 */
 }
 
 .section {
@@ -322,8 +333,32 @@ const closeModal = () => {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  border: 5px solid rgb(0, 0, 0, 0.1);
   object-fit: cover;
+}
+
+.login-img {
+  z-index: 2; /* login-img가 뒤로 가도록 낮은 z-index 설정 */
+  position: relative;
+}
+
+.login-border-img {
+  z-index: 3; /* login-border-img가 앞에 오도록 높은 z-index 설정 */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  pointer-events: none; /* 이미지가 클릭되지 않도록 설정 */
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 30px;
+  color: #000;
+  text-decoration: none;
 }
 
 .container-mypage-form-btn {

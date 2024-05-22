@@ -19,4 +19,5 @@ public interface UserMapper {
     String getProfileImageUrl(String email) throws SQLException;
     String checkPassword(Map<String, String> map) throws SQLException;
     int updateProfile(Map<String, String> userInfo) throws SQLException;
+    int updateProfileBorderExp(Map<String, Object> userInfo) throws SQLException;
 }

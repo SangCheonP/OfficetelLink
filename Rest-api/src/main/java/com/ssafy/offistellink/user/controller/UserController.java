@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -278,4 +276,28 @@ public class UserController {
         return new ResponseEntity<>(message, status);
     }
 
+    @Operation(summary = "마이페이지 테두리, 경험치바 변경", description = "입력받은 정보로 테두리, 경험치비 변경함")
+    @PostMapping("/update-profile/border/{borderId}/exp/{expId}")
+    public ResponseEntity<String> updateProfileBorderExp(
+            @RequestBody Map<String, String> info,
+            @PathVariable("borderId") String borderId,
+            @PathVariable("expId") String expId
+    ) throws Exception {
+
+        // 입력 받은 정보를 Map에 저장
+        Map<String, Object> updateInfo = new HashMap<>();
+        updateInfo.put("email", info.get("email"));
+        updateInfo.put("borderId", borderId);
+        updateInfo.put("expId", expId);
+
+        // 프로필 업데이트 서비스 호출
+        boolean isUpdated = userService.updateProfileBorderExp(updateInfo);
+
+        // 상태 및 메시지 설정
+        HttpStatus status = isUpdated ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
+        String message = isUpdated ? "정보를 변경하였습니다." : "정보 변경에 실패하였습니다.";
+
+        // 응답 생성 및 반환
+        return new ResponseEntity<>(message, status);
+    }
 }

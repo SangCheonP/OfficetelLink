@@ -98,4 +98,10 @@ public class UserServiceImpl implements UserService {
         return updateCount > 0;
     }
 
+    @Override
+    public boolean updateProfileBorderExp(Map<String, Object> updateInfo) throws Exception {
+        int updateCount = userMapper.updateProfileBorderExp(updateInfo);
+        return updateCount > 0;
+    }
+
 }
