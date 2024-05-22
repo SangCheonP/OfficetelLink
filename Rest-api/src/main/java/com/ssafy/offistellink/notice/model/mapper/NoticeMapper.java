@@ -1,5 +1,6 @@
 package com.ssafy.offistellink.notice.model.mapper;
 
+import com.ssafy.offistellink.file.model.dto.FileDto;
 import com.ssafy.offistellink.notice.model.dto.NoticeDto;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -20,4 +21,9 @@ public interface NoticeMapper {
     void incrementView(int id); //조회수 증가
 
     void incrementLikes(int id); //좋아요 증가
+
+    //파일 관리
+    void registerFile(FileDto fileDto);
+    void deleteFile(int id);
+    List<FileDto> fileList(int id);
 }

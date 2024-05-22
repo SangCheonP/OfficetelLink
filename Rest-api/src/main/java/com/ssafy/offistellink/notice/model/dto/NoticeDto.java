@@ -18,5 +18,5 @@ public class NoticeDto {
     private int isLike; //좋아요
 
     private String userEmail;
-//    private List<FileDto> files; //업로드할 파일
+    private List<FileDto> files; //업로드할 파일
 }

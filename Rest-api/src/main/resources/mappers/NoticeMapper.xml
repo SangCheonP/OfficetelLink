@@ -3,7 +3,7 @@
 <mapper namespace="com.ssafy.offistellink.notice.model.mapper.NoticeMapper">
 
     <resultMap id="notices" type="NoticeDto">
-        <result column="id" property="id"/>
+        <id column="id" property="id"/>
         <result column="user_email" property="userEmail"/>
         <result column="title" property="title"/>
         <result column="content" property="content"/>
@@ -12,16 +12,13 @@
         <result column="updated_at" property="updatedAt"/>
         <result column="is_pinned" property="isPinned"/>
         <result column="is_like" property="isLike"/>
+        <collection property="files" column="id" javaType="ArrayList" ofType="com.ssafy.offistellink.file.model.dto.FileDto" select="fileList"/>
     </resultMap>
 
-    <!-- 개별 공지사항 조회 -->
     <select id="getNoticeById" resultMap="notices">
-        Select *
-        from notices
-        where id = #{id}
+        SELECT * FROM notices WHERE id = #{id}
     </select>
 
-    <!-- 공지사항 조회 -->
     <select id="getAllNotices" resultMap="notices">
         SELECT *, (CASE WHEN user_email LIKE '%admin%' THEN true ELSE false END) AS is_pinned
         FROM notices
@@ -47,17 +44,32 @@
         DELETE FROM notices WHERE id = #{id}
     </delete>
 
-    <!-- 조회수 증가 -->
     <update id="incrementView" parameterType="int">
-        UPDATE notices
-        SET views = views + 1
-        WHERE id = #{id}
+        UPDATE notices SET views = views + 1 WHERE id = #{id}
     </update>
 
-    <!-- 좋아요 수 증가 -->
     <update id="incrementLikes" parameterType="int">
-        UPDATE notices
-        SET is_like = is_like + 1
-        WHERE id = #{id}
+        UPDATE notices SET is_like = is_like + 1 WHERE id = #{id}
     </update>
+
+    <resultMap id="files" type="com.ssafy.offistellink.file.model.dto.FileDto">
+        <id column="id" property="id"/>
+        <result column="origin_name" property="originName"/>
+        <result column="saved_name" property="savedName"/>
+        <result column="path" property="path"/>
+        <result column="notice_id" property="noticeId"/>
+    </resultMap>
+
+    <select id="fileList" resultMap="files">
+        SELECT * FROM files WHERE notice_id = #{noticeId}
+    </select>
+
+    <insert id="registerFile" parameterType="com.ssafy.offistellink.file.model.dto.FileDto">
+        INSERT INTO files (notice_id, origin_name, saved_name, path)
+        VALUES (#{noticeId}, #{originName}, #{savedName}, #{path})
+    </insert>
+
+    <delete id="deleteFile" parameterType="int">
+        DELETE FROM files WHERE notice_id = #{noticeId}
+    </delete>
 </mapper>

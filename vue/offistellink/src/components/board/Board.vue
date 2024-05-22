@@ -18,7 +18,7 @@
                 <p class="notice-likes">좋아요: {{ notice.isLike }}</p>
                 <p class="notice-views">조회수: {{ notice.views }}</p>
               </div>
-              <p class="notice-content">{{notice.content}}</p>
+              <p class="notice-content" v-html="stripHtmlTags(notice.content)"></p>
               <p class="notice-author">{{ notice.userEmail }}</p>
             </div>
           </div>
@@ -80,6 +80,10 @@ const handleNoticeClick = (id) => {
 
 const navigateToCreateBoard = () => {
   router.push({ name: 'create-board' });
+};
+
+const stripHtmlTags = (content) => {
+  return content.replace(/<\/?[^>]+(>|$)/g, "");
 };
 </script>
 

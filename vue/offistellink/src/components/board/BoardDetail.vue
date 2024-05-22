@@ -2,10 +2,26 @@
   <div class="board-wrapper">
     <div class="board-container">
       <template v-if="editMode">
-        <div class="title">제목</div>
-        <input v-model="editForm.title" class="edit-input" />
-        <div class="content">내용</div>
-        <div ref="editorContainer" class="edit-textarea"></div>
+        <div class="form-group">
+          <label for="title">제목</label>
+          <input v-model="editForm.title" id="title" class="edit-input" required />
+        </div>
+        <div class="form-group">
+          <label for="content">내용</label>
+          <div ref="editorContainer" class="edit-textarea"></div>
+        </div>
+        <div class="form-group">
+          <label for="file">파일 첨부하기</label>
+          <div class="file-input-wrapper">
+            <input type="file" id="file" @change="handleFileUpload" multiple />
+            <div class="file-list">
+              <div v-for="file in editForm.files" :key="file.id">
+                {{ file.originName }}
+                <button @click="confirmFileDelete(file.id)">삭제</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </template>
       <template v-else>
         <h1>{{ notice.title }}</h1>
@@ -32,7 +48,12 @@
         </div>
         <div class="notice-content" v-html="notice.content"></div>
         <div class="file-content">
-          <span>파일: {{ notice.fileName }}</span>
+          <p><b>첨부 파일</b></p>
+          <div v-for="file in notice.files" :key="file.id">
+            <a :href="`http://localhost:8080/files/download/${file.savedName}`" @click.prevent="downloadFile(file.savedName)">
+              {{ file.originName }}
+            </a>
+          </div>
         </div>
       </template>
       <div class="button-group">
@@ -56,7 +77,8 @@ import 'quill/dist/quill.snow.css';
 const notice = ref({});
 const editForm = ref({
   title: '',
-  content: ''
+  content: '',
+  files: []
 });
 const editMode = ref(false);
 const route = useRoute();
@@ -65,11 +87,13 @@ const hasLiked = ref(false);
 
 const editor = ref(null);
 const editorContainer = ref(null);
+const selectedFiles = ref([]);
 
 const fetchNotice = async () => {
   try {
     const response = await axios.get(`http://localhost:8080/notices/${route.params.id}`);
     notice.value = response.data;
+    editForm.value.files = response.data.files || [];
   } catch (error) {
     console.error('Error fetching notice:', error);
   }
@@ -101,7 +125,19 @@ const confirmUpdate = async () => {
 const updateNotice = async () => {
   try {
     editForm.value.content = editor.value.root.innerHTML;
-    const response = await axios.put(`http://localhost:8080/notices/${route.params.id}`, editForm.value);
+
+    const formData = new FormData();
+    formData.append('notice', new Blob([JSON.stringify(editForm.value)], { type: 'application/json' }));
+    selectedFiles.value.forEach(file => {
+      formData.append('files', file);
+    });
+
+    const response = await axios.put(`http://localhost:8080/notices/${route.params.id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+
     notice.value = response.data;
     editMode.value = false;
   } catch (error) {
@@ -132,6 +168,48 @@ const likeNotice = async (id) => {
     hasLiked.value = true;
   } catch (error) {
     console.error('Error liking notice:', error);
+  }
+};
+
+const handleFileUpload = (event) => {
+  const files = Array.from(event.target.files);
+  if (files.length > 0) {
+    selectedFiles.value = files;
+  } else {
+    selectedFiles.value = editForm.value.files;
+  }
+};
+
+const confirmFileDelete = async (fileId) => {
+  if (confirm('파일을 삭제하시겠습니까?')) {
+    await deleteFile(fileId);
+  }
+};
+
+const deleteFile = async (fileId) => {
+  try {
+    await axios.delete(`http://localhost:8080/files/${fileId}`);
+    // Remove the file from the editForm.files array
+    editForm.value.files = editForm.value.files.filter(file => file.id !== fileId);
+  } catch (error) {
+    console.error('Error deleting file:', error);
+  }
+};
+
+const downloadFile = async (savedName) => {
+  try {
+    const response = await axios.get(`http://localhost:8080/files/download/${savedName}`, {
+      responseType: 'blob'
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', savedName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error('Error downloading file:', error);
   }
 };
 
@@ -207,6 +285,33 @@ h1 {
   margin-bottom: 20px;
 }
 
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.edit-input,
+.edit-textarea,
+#file {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: 'Poppins', sans-serif;
+  color: #666;
+}
+
+.edit-textarea {
+  height: 300px;
+  margin-bottom: 20px;
+}
+
 .notice-meta {
   display: flex;
   justify-content: space-between;
@@ -277,27 +382,22 @@ h1 {
   font-size: 16px;
 }
 
-.edit-input,
-.edit-textarea {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+/* New CSS for aligning file names to the left */
+.file-input-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.file-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align items to the left */
+  margin-top: 10px;
+}
+
+.file-list div {
+  margin-bottom: 5px;
   font-family: 'Poppins', sans-serif;
   color: #666;
-}
-
-.edit-textarea {
-  height: 300px;
-  margin-bottom: 20px;
-}
-
-.title,
-.content {
-  margin: 20px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 16px;
-  font-weight: bold;
 }
 </style>

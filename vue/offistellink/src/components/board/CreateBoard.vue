@@ -1,84 +1,101 @@
 <template>
-    <div class="create-board-wrapper">
-        <div class="create-board-container">
-        <form @submit.prevent="handleSubmit">
-            <div class="form-group">
-            <label for="title">제목</label>
-            <input type="text" id="title" v-model="form.title" required />
-            </div>
-            <div class="form-group">
-            <label for="content">내용</label>
-            <div ref="editorContainer" class="editor-container"></div>
-            </div>
-            <div class="button-group">
-                <button type="submit" class="btn btn-info">등록</button>
-                <router-link v-if="!editMode" :to="{ name: 'board' }" class="btn btn-primary">취소</router-link>
-            </div>
-        </form>
+  <div class="create-board-wrapper">
+    <div class="create-board-container">
+      <form @submit.prevent="handleSubmit" class="custom-form" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="title">제목</label>
+          <input type="text" id="title" v-model="form.title" required />
         </div>
+        <div class="form-group">
+          <label for="content">내용</label>
+          <div ref="editorContainer" class="editor-container"></div>
+        </div>
+        <div class="form-group">
+          <label for="file">파일 첨부하기</label>
+          <input type="file" id="file" @change="handleFileUpload" multiple />
+        </div>
+        <div class="button-group">
+          <button type="submit" class="btn btn-info">등록</button>
+          <router-link v-if="!editMode" :to="{ name: 'board' }" class="btn btn-primary">취소</router-link>
+        </div>
+      </form>
     </div>
+  </div>
 </template>
   
 <script setup>
-    import { ref, onMounted } from 'vue';
-    import axios from 'axios';
-    import { useRouter } from 'vue-router';
-    import Quill from 'quill';
-    import 'quill/dist/quill.snow.css';
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
+import Quill from 'quill';
+import 'quill/dist/quill.snow.css';
 
-    const form = ref({
-    title: '',
-    content: ''
+const form = ref({
+  title: '',
+  content: ''
+});
+
+const router = useRouter();
+const editor = ref(null);
+const editorContainer = ref(null);
+const selectedFiles = ref([]);
+
+const handleFileUpload = (event) => {
+  selectedFiles.value = Array.from(event.target.files);
+};
+
+const handleSubmit = async () => {
+  const userStore = JSON.parse(localStorage.getItem('userStore'));
+  const userEmail = userStore.userInfo.email;
+
+  const formData = new FormData();
+  const noticeData = {
+    title: form.value.title,
+    content: editor.value.root.innerHTML,
+    userEmail: userEmail
+  };
+
+  formData.append('notice', new Blob([JSON.stringify(noticeData)], { type: 'application/json' }));
+  selectedFiles.value.forEach(file => {
+    formData.append('files', file);
+  });
+
+  try {
+    const response = await axios.post('http://localhost:8080/notices', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
     });
-
-    const router = useRouter();
-    const editor = ref(null);
-    const editorContainer = ref(null);
-
-    const handleSubmit = async () => {
-    const userStore = JSON.parse(localStorage.getItem('userStore'));
-    const userEmail = userStore.userInfo.email;
-
-    const formData = {
-        title: form.value.title,
-        content: editor.value.root.innerHTML,
-        userEmail: userEmail
-    };
-
-    try {
-        const response = await axios.post('http://localhost:8080/notices', formData);
-        if (response.status === 201) {
-        alert('공지사항이 등록되었습니다');
-        router.push({ name: 'board' });
-        }
-    } catch (error) {
-        console.error('Error creating notice:', error);
+    if (response.status === 201) {
+      alert('공지사항이 등록되었습니다');
+      router.push({ name: 'board' });
     }
-    };
+  } catch (error) {
+    console.error('Error creating notice:', error);
+  }
+};
 
-    onMounted(() => {
-    editor.value = new Quill(editorContainer.value, {
-        theme: 'snow',
-        placeholder: '내용을 입력하세요...',
-        modules: {
-            toolbar: [
-            ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block'],
-            [{ 'header': 1 }, { 'header': 2 }],
-            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-            [{ 'script': 'sub' }, { 'script': 'super' }],
-            [{ 'indent': '-1' }, { 'indent': '+1' }],
-            [{ 'direction': 'rtl' }],
-            [{ 'size': ['small', false, 'large', 'huge'] }],
-            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-            [{ 'color': [] }, { 'background': [] }],
-            [{ 'font': [] }],
-            [{ 'align': [] }],
-            ['link', 'clean']
-        ]
-
-        }
-    });
-    });
+onMounted(() => {
+  editor.value = new Quill(editorContainer.value, {
+    theme: 'snow',
+    modules: {
+      toolbar: [
+        ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block'],
+        [{ 'header': 1 }, { 'header': 2 }],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+        [{ 'script': 'sub' }, { 'script': 'super' }],
+        [{ 'indent': '-1' }, { 'indent': '+1' }],
+        [{ 'direction': 'rtl' }],
+        [{ 'size': ['small', false, 'large', 'huge'] }],
+        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+        [{ 'color': [] }, { 'background': [] }],
+        [{ 'font': [] }],
+        [{ 'align': [] }],
+        ['link', 'clean']
+      ]
+    }
+  });
+});
 </script>
 
 <style scoped>
@@ -95,7 +112,7 @@
 }
 
 .create-board-container {
-  max-width: 600px;
+  max-width: 1000px;
   width: 100%;
   margin: 0 auto;
   padding: 20px;
@@ -122,7 +139,8 @@
   font-weight: bold;
 }
 
-.form-group input#title {
+.form-group input#title,
+.form-group input#file {
   width: 100%;
   padding: 10px;
   border: 1px solid #ccc;

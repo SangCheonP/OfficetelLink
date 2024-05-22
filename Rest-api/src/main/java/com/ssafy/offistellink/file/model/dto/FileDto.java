@@ -9,7 +9,6 @@ public class FileDto {
     private String originName;
     private String savedName;
     private String path;
-    private String type;
 
     private int noticeId;
 }

@@ -3,29 +3,14 @@
 <mapper namespace="com.ssafy.offistellink.file.model.mapper.FileMapper">
 
     <resultMap id="files" type="FileDto">
-        <id property="id" column="id"/>
-        <result property="originName" column="origin_name"/>
-        <result property="savedName" column="saved_name"/>
-        <result property="path" column="path"/>
-        <result property="type" column="type"/>
-        <result property="noticeId" column="notice_id"/>
+        <id column="id" property="id"/>
+        <result column="origin_name" property="originName"/>
+        <result column="saved_name" property="savedName"/>
+        <result column="path" property="path"/>
+        <result column="notice_id" property="noticeId"/>
     </resultMap>
 
-    <!-- 파일 조회 -->
-    <select id="getFileById" resultMap="files">
-        SELECT * FROM files WHERE id = #{id}
-    </select>
-
-    <select id="getFilesByNoticeId" resultMap="files">
-        SELECT * FROM files WHERE notice_id = #{noticeId}
-    </select>
-
-    <insert id="insertFile" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO files (notice_id, origin_name, path)
-        VALUES (#{noticeId}, #{originName}, #{path})
-    </insert>
-
-    <delete id="deleteFilesByNoticeId">
-        DELETE FROM files WHERE notice_id = #{noticeId}
+    <delete id="deleteFile" parameterType="int">
+        DELETE FROM files WHERE id = #{id}
     </delete>
 </mapper>
