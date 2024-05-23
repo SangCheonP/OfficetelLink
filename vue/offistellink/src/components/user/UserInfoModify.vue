@@ -151,7 +151,6 @@ const updateUserInfo = async () => {
       phoneInput.value
     );
     alert("정보가 성공적으로 변경되었습니다.");
-    router.replace("/user/mypage");
   } catch (error) {
     errorMessage.value = "정보 변경에 실패했습니다.";
   }
@@ -284,7 +283,7 @@ const closeModal = () => {
       </div>
 
       <div class="container-mypage-form-btn">
-        <router-link class="mypage-form-btn" @click="updateUserInfo">변경</router-link>
+        <router-link class="mypage-form-btn" :to="{name: 'user-mypage'}" @click="updateUserInfo">변경</router-link>
       </div>
     </div>
 
