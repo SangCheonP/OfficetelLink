@@ -69,7 +69,7 @@ const logout = () => {
             <li class="nav-item">
               <router-link
                 class="nav-link"
-                :to="{ name: 'shop' }"
+                :to="{ name: 'shop-main' }"
                 exact-active-class="active"
                 >상점</router-link
               >

@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 public interface NoticeService {
     NoticeDto getNoticeById(int id) throws SQLException; //공지사항 id 조회
@@ -23,4 +24,6 @@ public interface NoticeService {
     void incrementView(int id) throws SQLException; //조회수 증가
 
     void incrementLikes(int id) throws SQLException; //좋아요 증가
+
+    List<Map<String, Object>> getRecentNoticesByEmail(String email) throws Exception; // 최근 게시글 가져옴
 }

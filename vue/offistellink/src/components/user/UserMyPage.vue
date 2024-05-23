@@ -3,6 +3,13 @@ import { ref, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useUserStore } from "@/stores/user";
 
+import {getRecentNotice} from "@/api/board"
+import { httpStatusCode } from "@/util/http-status";
+
+import UserMyPageRecentNotice from "./UserMyPageRecentNotice.vue";
+import UserMyPageRecentComment from "./UserMyPageRecentComment.vue";
+import UserMyPageRecentSavedPost from "./UserMyPageRecentSavedPost.vue";
+
 const userStore = useUserStore();
 const { userInfo, borderImages } = storeToRefs(userStore);
 const { userLogout } = userStore;
@@ -16,44 +23,94 @@ const logout = () => {
 // 탭 상태 관리
 const activeTab = ref("recentPosts");
 
-// 예시 데이터
-const recentPosts = ref([
-  "최근 게시글 1",
-  "최근 게시글 2",
-  "최근 게시글 3",
-  "최근 게시글 4",
-  "최근 게시글 5",
-  "최근 게시글 6",
-  "최근 게시글 7",
-  "최근 게시글 8",
-  "최근 게시글 9",
-  "최근 게시글 10",
-]);
+const recentPosts = ref([]);
+
+const fetchRecentPosts = async () => {
+  await getRecentNotice(userInfo.value.email,
+    (response) =>{
+      if (response.status === httpStatusCode.OK) {
+        console.log(response);
+        recentPosts.value = response.data;      }
+    },
+    (error) => {
+      console.log("최근 게시글 받아오기 실패" + error)
+    }
+  )
+};
+
+const activateRecentPostsTab = () => {
+  activeTab.value = 'recentPosts';
+  fetchRecentPosts();
+};
+
+onMounted(() => {
+  fetchRecentPosts();
+});
 
 const recentComments = ref([
-  "최근 댓글 1",
-  "최근 댓글 2",
-  "최근 댓글 3",
-  "최근 댓글 4",
-  "최근 댓글 5",
-  "최근 댓글 6",
-  "최근 댓글 7",
-  "최근 댓글 8",
-  "최근 댓글 9",
-  "최근 댓글 10",
+  {
+    "created_at": "2024-05-22T16:01:19.000+00:00",
+    "id": 83,
+    "comment": "좋은 정보 감사합니다."
+  },
+  {
+    "created_at": "2024-05-22T14:51:50.000+00:00",
+    "id": 79,
+    "comment": "1111"
+  },
+  {
+    "created_at": "2024-05-22T14:43:42.000+00:00",
+    "id": 78,
+    "comment": "2222"
+  },
+  {
+    "created_at": "2024-05-22T14:09:09.000+00:00",
+    "id": 75,
+    "comment": "감사합니다~"
+  },
+  {
+    "created_at": "2024-05-22T14:09:02.000+00:00",
+    "id": 74,
+    "comment": "재밌어요"
+  },
+  {
+    "created_at": "2024-05-22T13:56:28.000+00:00",
+    "id": 73,
+    "comment": "ㅎㅎ"
+  },
+  {
+    "created_at": "2024-05-22T13:42:51.000+00:00",
+    "id": 72,
+    "comment": "감사합니다~"
+  },
+  {
+    "created_at": "2024-05-22T13:37:49.000+00:00",
+    "id": 71,
+    "comment": "재밌어요ㅎㅎ"
+  },
+  {
+    "created_at": "2024-05-22T13:31:49.000+00:00",
+    "id": 70,
+    "comment": "ㅎㅇㅎㅇ~"
+  },
+  {
+    "created_at": "2024-05-22T13:26:08.000+00:00",
+    "id": 69,
+    "comment": "안녕하세요~~"
+  }
 ]);
 
 const savedPosts = ref([
-  "저장한 게시글 1",
-  "저장한 게시글 2",
-  "저장한 게시글 3",
-  "저장한 게시글 4",
-  "저장한 게시글 5",
-  "저장한 게시글 6",
-  "저장한 게시글 7",
-  "저장한 게시글 8",
-  "저장한 게시글 9",
-  "저장한 게시글 10",
+  {
+    "saved_at": "2024-05-22T16:01:19.000+00:00",
+    "writer": 83,
+    "title": "덕명동 15평 월세 새입자 구합니다~"
+  },
+  {
+    "saved_at": "2024-05-22T14:51:50.000+00:00",
+    "writer": 79,
+    "title": "유온역 근처 좋은 매물있나요?"
+  },
 ]);
 
 onMounted(() => {
@@ -104,7 +161,7 @@ onMounted(() => {
             <label>댓글 :</label>
             <span>3 </span>
             <label>포인트 :</label>
-            <router-link :to="{ name: 'shop' }">{{
+            <router-link :to="{ name: 'shop-main' }">{{
               userInfo.point
             }}</router-link>
           </div>
@@ -143,7 +200,7 @@ onMounted(() => {
         <button
           class="mypage-tab-btn"
           :class="{ active: activeTab === 'recentPosts' }"
-          @click="activeTab = 'recentPosts'"
+          @click="activateRecentPostsTab"
         >
           최근 게시글
         </button>
@@ -164,17 +221,9 @@ onMounted(() => {
       </div>
 
       <div class="mypage-content">
-        <ul v-if="activeTab === 'recentPosts'">
-          <li v-for="(post, index) in recentPosts" :key="index">{{ post }}</li>
-        </ul>
-        <ul v-if="activeTab === 'recentComments'">
-          <li v-for="(comment, index) in recentComments" :key="index">
-            {{ comment }}
-          </li>
-        </ul>
-        <ul v-if="activeTab === 'savedPosts'">
-          <li v-for="(post, index) in savedPosts" :key="index">{{ post }}</li>
-        </ul>
+        <UserMyPageRecentNotice v-if="activeTab === 'recentPosts'" :posts="recentPosts"/>
+        <UserMyPageRecentComment v-if="activeTab === 'recentComments'" :comments="recentComments"/>
+        <UserMyPageRecentSavedPost  v-if="activeTab === 'savedPosts'" :savedPosts="savedPosts"/>
       </div>
     </div>
 

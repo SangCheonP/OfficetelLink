@@ -72,4 +72,11 @@
     <delete id="deleteFile" parameterType="int">
         DELETE FROM files WHERE notice_id = #{noticeId}
     </delete>
+
+    <select id="getRecentNoticesByEmail" parameterType="string" resultType="map">
+        select id, title, created_at from notices
+        where user_email = #{email}
+        order by created_at desc
+        limit 10;
+    </select>
 </mapper>

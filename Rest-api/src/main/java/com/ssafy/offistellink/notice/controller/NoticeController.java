@@ -3,6 +3,7 @@ package com.ssafy.offistellink.notice.controller;
 import com.ssafy.offistellink.file.model.dto.FileDto;
 import com.ssafy.offistellink.notice.model.dto.NoticeDto;
 import com.ssafy.offistellink.notice.model.service.NoticeService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Tag(name = "Notice", description = "공지 사항 관리")
 @RequestMapping("/notices")
@@ -105,6 +107,16 @@ public class NoticeController {
             }
         }
         return fileDtos;
+    }
+
+    @Operation(summary = "최근 10개 게시물", description = "해당 유저의 최근 10개 게시물을 가져옴")
+    @GetMapping("/{email}/10notices")
+    public ResponseEntity<List<Map<String, Object>>> getRecentNotices(@PathVariable("email") String email) throws Exception {
+        List<Map<String, Object>> noticeList = noticeService.getRecentNoticesByEmail(email);
+
+        HttpStatus status = noticeList.isEmpty() ? HttpStatus.BAD_REQUEST : HttpStatus.OK;
+
+        return new ResponseEntity<>(noticeList, status);
     }
 
 }

@@ -4,7 +4,9 @@ import com.ssafy.offistellink.file.model.dto.FileDto;
 import com.ssafy.offistellink.notice.model.dto.NoticeDto;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface NoticeMapper {
@@ -26,4 +28,5 @@ public interface NoticeMapper {
     void registerFile(FileDto fileDto);
     void deleteFile(int id);
     List<FileDto> fileList(int id);
+    List<Map<String, Object>> getRecentNoticesByEmail(String email) throws SQLException; // 최근 게시글 가져옴
 }

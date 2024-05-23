@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -75,6 +76,11 @@ public class NoticeServiceImpl implements NoticeService {
     @Transactional
     public void incrementLikes(int id) {
         noticeMapper.incrementLikes(id);
+    }
+
+    @Override
+    public List<Map<String, Object>> getRecentNoticesByEmail(String email) throws Exception {
+        return noticeMapper.getRecentNoticesByEmail(email);
     }
 
     private void saveFiles(NoticeDto noticeDto) {
