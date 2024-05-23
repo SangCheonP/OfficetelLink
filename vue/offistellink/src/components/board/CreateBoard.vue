@@ -22,13 +22,14 @@
     </div>
   </div>
 </template>
-  
+
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
+import { useToast } from 'vue-toastification';
 
 const form = ref({
   title: '',
@@ -43,6 +44,8 @@ const selectedFiles = ref([]);
 const handleFileUpload = (event) => {
   selectedFiles.value = Array.from(event.target.files);
 };
+
+const toast = useToast();
 
 const handleSubmit = async () => {
   const userStore = JSON.parse(localStorage.getItem('userStore'));
@@ -60,6 +63,7 @@ const handleSubmit = async () => {
     formData.append('files', file);
   });
 
+  
   try {
     const response = await axios.post('http://localhost:8080/notices', formData, {
       headers: {
@@ -67,10 +71,11 @@ const handleSubmit = async () => {
       }
     });
     if (response.status === 201) {
-      alert('공지사항이 등록되었습니다');
+      toast.success('게시글 등록 완료!');
       router.push({ name: 'board' });
     }
   } catch (error) {
+    toast.error('공지사항 등록 중 오류가 발생했습니다');
     console.error('Error creating notice:', error);
   }
 };

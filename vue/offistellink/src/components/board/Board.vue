@@ -30,7 +30,7 @@
           <button @click="handlePageChange(currentPage + 1)" :disabled="currentPage === totalPages">다음</button>
           <button @click="handlePageChange(totalPages)" :disabled="currentPage === totalPages">끝으로</button>
         </div>
-        <button v-if="isAdmin" class="create-button" @click="navigateToCreateBoard">등록</button>
+        <button class="create-button" @click="navigateToCreateBoard">등록</button>
       </div>
     </div>
   </div>
@@ -45,9 +45,6 @@ const notices = ref([]);
 const router = useRouter();
 const currentPage = ref(1);
 const noticesPerPage = ref(8);
-
-const userStore = JSON.parse(localStorage.getItem('userStore'));
-const isAdmin = computed(() => userStore?.userInfo?.admin === true);
 
 const fetchNotices = async () => {
   try {
@@ -123,7 +120,7 @@ const truncateContent = (content, maxLength) => {
 }
 
 .titleMain {
-  color: #1a0d31; /* 다크 블루 색상으로 변경 */
+  color: #1a0d31;
   font-family: 'Noto Sans', sans-serif; /* 글꼴 유지 */
   font-size: 2em; /* 글씨 크기 약간 증가 */
   text-align: center; /* 텍스트 정렬 유지 */

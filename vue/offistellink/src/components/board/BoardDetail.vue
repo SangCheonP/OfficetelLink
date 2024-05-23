@@ -76,13 +76,13 @@ import 'quill/dist/quill.snow.css';
 import { useToast } from 'vue-toastification';
 
 const toast = useToast();
-
 const notice = ref({});
 const editForm = ref({
   title: '',
   content: '',
   files: []
 });
+
 const editMode = ref(false);
 const route = useRoute();
 const router = useRouter();
@@ -115,7 +115,7 @@ const fetchNotice = async () => {
 const confirmDelete = async (id) => {
   if (confirm('삭제하시겠습니까?')) {
     await deleteNotice(id);
-    toast.success('삭제되었습니다.');
+    toast.success('삭제 완료!');
   }
 };
 
@@ -173,7 +173,7 @@ const updateNotice = async () => {
 const confirmLike = async (id) => {
   if (!hasLiked.value && confirm('좋아요를 누르시겠습니까?')) {
     likeNotice(id);
-    toast.success('좋아요가 반영되었습니다.');
+    toast.success('좋아요 반영!');
   }
 };
 
@@ -200,7 +200,7 @@ const handleFileUpload = (event) => {
 const confirmFileDelete = async (fileId) => {
   if (confirm('파일을 삭제하시겠습니까?')) {
     await deleteFile(fileId);
-    toast.success('파일이 삭제되었습니다.');
+    toast.success('파일 삭제 완료!');
   }
 };
 
