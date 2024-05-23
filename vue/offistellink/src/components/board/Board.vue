@@ -18,7 +18,7 @@
                 <p class="notice-likes">좋아요: {{ notice.isLike }}</p>
                 <p class="notice-views">조회수: {{ notice.views }}</p>
               </div>
-              <p class="notice-content" v-html="stripHtmlTags(notice.content)"></p>
+              <p class="notice-content">{{ truncateContent(stripHtmlTags(notice.content), 20) }}</p>
               <p class="notice-author">{{ notice.userEmail }}</p>
             </div>
           </div>
@@ -30,7 +30,7 @@
           <button @click="handlePageChange(currentPage + 1)" :disabled="currentPage === totalPages">다음</button>
           <button @click="handlePageChange(totalPages)" :disabled="currentPage === totalPages">끝으로</button>
         </div>
-        <button class="create-button" @click="navigateToCreateBoard">등록</button>
+        <button v-if="isAdmin" class="create-button" @click="navigateToCreateBoard">등록</button>
       </div>
     </div>
   </div>
@@ -43,9 +43,11 @@ import axios from 'axios';
 
 const notices = ref([]);
 const router = useRouter();
-
 const currentPage = ref(1);
 const noticesPerPage = ref(8);
+
+const userStore = JSON.parse(localStorage.getItem('userStore'));
+const isAdmin = computed(() => userStore?.userInfo?.admin === true);
 
 const fetchNotices = async () => {
   try {
@@ -85,6 +87,13 @@ const navigateToCreateBoard = () => {
 const stripHtmlTags = (content) => {
   return content.replace(/<\/?[^>]+(>|$)/g, "");
 };
+
+const truncateContent = (content, maxLength) => {
+  if (content.length > maxLength) {
+    return content.substring(0, maxLength) + '...';
+  }
+  return content;
+};
 </script>
 
 <style scoped>
@@ -114,15 +123,17 @@ const stripHtmlTags = (content) => {
 }
 
 .titleMain {
-  color: #4A90E2; /* 텍스트 색상 */
-  font-family: 'Arial', sans-serif; /* 글꼴 */
-  font-size: 2em; /* 글씨 크기 */
-  text-align: center; /* 텍스트 정렬 */
-  font-weight: bold; /* 글씨 굵기 */
-  margin-top: 20px; /* 상단 여백 */
-  margin-bottom: 40px; /* 하단 여백 */
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* 텍스트 그림자 */
+  color: #1a0d31; /* 다크 블루 색상으로 변경 */
+  font-family: 'Noto Sans', sans-serif; /* 글꼴 유지 */
+  font-size: 2em; /* 글씨 크기 약간 증가 */
+  text-align: center; /* 텍스트 정렬 유지 */
+  font-weight: 700; /* 숫자로 굵기 지정 */
+  margin-top: 30px; /* 상단 여백 증가 */
+  margin-bottom: 50px; /* 하단 여백 증가 */
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2); /* 텍스트 그림자 부드럽게 */
+  letter-spacing: 0.05em; /* 자간 추가 */
 }
+
 
 .title {
   text-align: center;

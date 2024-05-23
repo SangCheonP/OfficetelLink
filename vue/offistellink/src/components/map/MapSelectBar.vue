@@ -13,7 +13,7 @@
       <option v-for="road in roadOptions" :key="road" :value="road">{{ road }}</option>
     </select>
     <div class="input-group-append">
-      <button class="btn btn-outline-secondary custom-button" type="button" @click="search">검색</button>
+      <button class="btn btn-outline-success custom-button" type="button" @click="search">검색</button>
     </div>
   </div>
 </template>
@@ -79,9 +79,6 @@ export default {
 }
 
 .custom-button {
-  background-color: rgba(87, 184, 70, 0.8);
-  border-color: rgba(87, 184, 70, 0.8);
-  color: white;
   border-radius: 5px;
   padding: 10px 20px;
   font-size: 14px;

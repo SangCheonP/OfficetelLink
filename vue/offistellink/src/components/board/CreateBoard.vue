@@ -15,8 +15,8 @@
           <input type="file" id="file" @change="handleFileUpload" multiple />
         </div>
         <div class="button-group">
-          <button type="submit" class="btn btn-info">등록</button>
-          <router-link v-if="!editMode" :to="{ name: 'board' }" class="btn btn-primary">취소</router-link>
+          <button type="submit" class="btn btn-outline-info">등록</button>
+          <router-link v-if="!editMode" :to="{ name: 'board' }" class="btn btn-outline-primary">취소</router-link>
         </div>
       </form>
     </div>

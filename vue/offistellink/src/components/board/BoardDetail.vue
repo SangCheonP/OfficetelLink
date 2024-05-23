@@ -10,15 +10,15 @@
           <label for="content">내용</label>
           <div ref="editorContainer" class="edit-textarea"></div>
         </div>
-        <div class="form-group">
-          <label for="file">파일 첨부하기</label>
-          <div class="file-input-wrapper">
+        <div class="file-input-wrapper">
+          <div class="form-group">
+            <label for="file">파일 첨부하기</label>
             <input type="file" id="file" @change="handleFileUpload" multiple />
-            <div class="file-list">
-              <div v-for="file in editForm.files" :key="file.id">
-                {{ file.originName }}
-                <button @click="confirmFileDelete(file.id)">삭제</button>
-              </div>
+          </div>
+          <div class="file-list">
+            <div v-for="file in editForm.files" :key="file.id">
+              {{ file.originName }}
+              <button @click="confirmFileDelete(file.id)" class="btn btn-outline-danger btn-sm">삭제</button>
             </div>
           </div>
         </div>
@@ -57,22 +57,25 @@
         </div>
       </template>
       <div class="button-group">
-        <router-link v-if="!editMode" :to="{ name: 'board' }" class="btn btn-primary">목록으로 돌아가기</router-link>
-        <button v-if="editMode" @click="confirmUpdate" class="btn btn-info">저장</button>
-        <button v-if="editMode" @click="cancelEdit" class="btn btn-secondary">취소</button>
-        <button v-if="!editMode" @click="editNotice" class="btn btn-info">수정</button>
-        <button v-if="!editMode" @click="confirmDelete(notice.id)" class="btn btn-danger">삭제</button>
+        <router-link v-if="!editMode" :to="{ name: 'board' }" class="btn btn-outline-secondary">목록으로 돌아가기</router-link>
+        <button v-if="editMode" @click="confirmUpdate" class="btn btn-outline-info">저장</button>
+        <button v-if="editMode" @click="cancelEdit" class="btn btn-outline-primary">취소</button>
+        <button v-if="!editMode && (isSameUser || isAdmin)" @click="editNotice" class="btn btn-outline-info">수정</button>
+        <button v-if="!editMode && (isSameUser || isAdmin)" @click="confirmDelete(notice.id)" class="btn btn-outline-danger">삭제</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
+import { useToast } from 'vue-toastification';
+
+const toast = useToast();
 
 const notice = ref({});
 const editForm = ref({
@@ -89,6 +92,16 @@ const editor = ref(null);
 const editorContainer = ref(null);
 const selectedFiles = ref([]);
 
+const userStore = JSON.parse(localStorage.getItem('userStore'));
+const userEmail = ref(userStore.userInfo.email);
+const isAdmin = ref(userStore.userInfo.admin);
+
+const isSameUser = computed(() => userEmail.value === notice.value.userEmail);
+
+onMounted(() => {
+  fetchNotice();
+});
+
 const fetchNotice = async () => {
   try {
     const response = await axios.get(`http://localhost:8080/notices/${route.params.id}`);
@@ -102,6 +115,17 @@ const fetchNotice = async () => {
 const confirmDelete = async (id) => {
   if (confirm('삭제하시겠습니까?')) {
     await deleteNotice(id);
+    toast.success('삭제되었습니다.');
+  }
+};
+
+const deleteNotice = async (id) => {
+  try {
+    await axios.delete(`http://localhost:8080/notices/${id}`);
+    router.push({ name: 'board' });
+  } catch (error) {
+    toast.error('삭제 중 오류가 발생했습니다.');
+    console.error('Error deleting notice:', error);
   }
 };
 
@@ -117,7 +141,7 @@ const cancelEdit = () => {
 const confirmUpdate = async () => {
   if (confirm('수정하시겠습니까?')) {
     await updateNotice();
-    alert('수정 완료!');
+    toast.success('수정 완료!');
     fetchNotice();
   }
 };
@@ -141,23 +165,15 @@ const updateNotice = async () => {
     notice.value = response.data;
     editMode.value = false;
   } catch (error) {
+    toast.error('수정 중 오류가 발생했습니다.');
     console.error('Error updating notice:', error);
-  }
-};
-
-const deleteNotice = async (id) => {
-  try {
-    await axios.delete(`http://localhost:8080/notices/${id}`);
-    router.push({ name: 'board' });
-  } catch (error) {
-    console.error('Error deleting notice:', error);
   }
 };
 
 const confirmLike = async (id) => {
   if (!hasLiked.value && confirm('좋아요를 누르시겠습니까?')) {
     likeNotice(id);
-    alert('좋아요가 반영되었습니다.');
+    toast.success('좋아요가 반영되었습니다.');
   }
 };
 
@@ -167,6 +183,7 @@ const likeNotice = async (id) => {
     notice.value.isLike += 1;
     hasLiked.value = true;
   } catch (error) {
+    toast.error('좋아요 반영 중 오류가 발생했습니다.');
     console.error('Error liking notice:', error);
   }
 };
@@ -183,6 +200,7 @@ const handleFileUpload = (event) => {
 const confirmFileDelete = async (fileId) => {
   if (confirm('파일을 삭제하시겠습니까?')) {
     await deleteFile(fileId);
+    toast.success('파일이 삭제되었습니다.');
   }
 };
 
@@ -192,6 +210,7 @@ const deleteFile = async (fileId) => {
     // Remove the file from the editForm.files array
     editForm.value.files = editForm.value.files.filter(file => file.id !== fileId);
   } catch (error) {
+    toast.error('파일 삭제 중 오류가 발생했습니다.');
     console.error('Error deleting file:', error);
   }
 };
@@ -209,6 +228,7 @@ const downloadFile = async (savedName) => {
     link.click();
     document.body.removeChild(link);
   } catch (error) {
+    toast.error('파일 다운로드 중 오류가 발생했습니다.');
     console.error('Error downloading file:', error);
   }
 };
@@ -246,8 +266,6 @@ watch(editMode, (newValue) => {
     }, 0);
   }
 });
-
-onMounted(fetchNotice);
 </script>
 
 <style scoped>
@@ -271,10 +289,11 @@ onMounted(fetchNotice);
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  min-height: 600px;
+  height: 90vh; /* 고정된 높이 */
   font-family: 'Poppins', sans-serif;
   display: flex;
   flex-direction: column;
+  overflow-y: auto; /* 전체 컨테이너 스크롤 */
 }
 
 h1 {
@@ -310,6 +329,7 @@ h1 {
 .edit-textarea {
   height: 300px;
   margin-bottom: 20px;
+  overflow-y: auto; /* 스크롤 추가 */
 }
 
 .notice-meta {
@@ -336,6 +356,8 @@ h1 {
   font-family: 'Poppins', sans-serif;
   color: #666;
   margin-bottom: 20px;
+  overflow-y: auto; /* 스크롤 추가 */
+  flex-grow: 1; /* 남은 공간을 차지하도록 설정 */
 }
 
 .notice-content img {
@@ -349,6 +371,7 @@ h1 {
   font-family: 'Poppins', sans-serif;
   color: #666;
   margin-bottom: 20px;
+  overflow-y: auto; /* 스크롤 추가 */
 }
 
 .good-img {
@@ -370,7 +393,7 @@ h1 {
 .button-group {
   display: flex;
   gap: 10px;
-  margin-top: auto;
+  margin-top: 20px; /* Adjusted to space elements above */
   justify-content: center;
 }
 
@@ -382,10 +405,11 @@ h1 {
   font-size: 16px;
 }
 
-/* New CSS for aligning file names to the left */
+/* New CSS for aligning file names to the bottom right above the buttons */
 .file-input-wrapper {
   display: flex;
   flex-direction: column;
+  margin-bottom: 20px; /* Add margin-bottom to avoid overlapping */
 }
 
 .file-list {

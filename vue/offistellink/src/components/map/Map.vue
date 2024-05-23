@@ -110,6 +110,42 @@ export default {
       }
     });
 
+    // 클러스터러에 마우스 오버 이벤트 리스너 추가
+    const addClusterEventListeners = (clusterer) => {
+      window.kakao.maps.event.addListener(clusterer, 'clusterover', function(cluster) {
+        const markers = cluster.getMarkers();
+        let totalDeal = 0;
+        markers.forEach(marker => {
+          totalDeal += marker.deal;
+        });
+        const averageDeal = (totalDeal / markers.length).toFixed(0);
+        const content = 
+          `<div style="padding:10px; background:rgba(255,255,255,0.9); color:#333; border-radius:10px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); font-size:14px; font-weight:bold;">
+            평균 거래가: ${averageDeal}만원
+          </div>`;
+        const position = cluster.getCenter();
+        const customOverlay = new window.kakao.maps.CustomOverlay({
+          position: position,
+          content: content,
+          xAnchor: 0.5,
+          yAnchor: 1.5
+        });
+
+        if (window.currentOverlay) {
+          window.currentOverlay.setMap(null);
+        }
+        customOverlay.setMap(map);
+        window.currentOverlay = customOverlay;
+      });
+
+      window.kakao.maps.event.addListener(clusterer, 'clusterout', function() {
+        if (window.currentOverlay) {
+          window.currentOverlay.setMap(null);
+          window.currentOverlay = null;
+        }
+      });
+    };
+
     // 카카오 맵 초기화 & db 데이터 연동
     const initMap = () => {
       if (mapContainer.value) {
@@ -127,6 +163,8 @@ export default {
           calculator: [10, 30, 100],
           styles: clusterStyles
         });
+
+        addClusterEventListeners(clusterer);
 
         const imageSize = new window.kakao.maps.Size(64, 69);
         const imageOption = { offset: new window.kakao.maps.Point(27, 69) };
